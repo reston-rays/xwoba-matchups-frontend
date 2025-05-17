@@ -57,8 +57,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const lookupPairs: Array<{ pit: number; bat: number; batName: string; pitName: string }> = [];
     const playerIds = new Set<number>();
     for (const g of games) {
-      const homePid = g.probablePitchers?.home?.id;
-      const awayPid = g.probablePitchers?.away?.id;
+      const homePid = g.probablePitcher?.home?.id;
+      const awayPid = g.probablePitcher?.away?.id;
       if (!homePid || !awayPid) continue;
 
       rosters[g.teams.home.team.id]?.forEach((p) => {
