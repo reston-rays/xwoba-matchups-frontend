@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/index.tsx
 'use client';
 
@@ -20,7 +21,7 @@ export default function HomePage() {
         const today = new Date().toISOString().slice(0, 10);
         const { data, error } = await supabaseBrowser
           .from('daily_matchups')
-          .select<Matchup>('batter_name, pitcher_name, avg_xwoba')
+          .select('batter_name, pitcher_name, avg_xwoba')
           .eq('game_date', today)
           .order('avg_xwoba', { ascending: false })
           .limit(20);

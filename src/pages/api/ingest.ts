@@ -34,18 +34,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // 3. Build roster cache
-    const teamIds = Array.from(
+    const teamIds: number[] = Array.from(
       new Set(games.flatMap((g: any) => [g.teams.home.team.id, g.teams.away.team.id]))
     );
     const rosters: Record<number, any[]> = {};
-    await Promise.all(
-      teamIds.map(async (tid) => {
-        const j = await fetchWithRetry(
-          `https://statsapi.mlb.com/api/v1/teams/${tid}/roster?rosterType=active`
-        );
-        rosters[tid] = j.roster;
-      })
-    );
+    const rosterPromises = teamIds.map(async (tid: number) => {
+      const j = await fetchWithRetry(
+        `https://statsapi.mlb.com/api/v1/teams/${tid}/roster?rosterType=active`
+      );
+      rosters[tid] = j.roster; // Store roster by team ID
+    });
+    await Promise.all(rosterPromises);
+
 
     // 4. Gather lookup pairs and unique IDs
     const lookupPairs: Array<{ pit: number; bat: number; batName: string; pitName: string }> = [];
@@ -102,11 +102,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // 7. Build upserts
-    const upserts: any[] = lookupPairs.reduce((acc, { pit, bat, batName, pitName }) => {
+    const upserts = lookupPairs.reduce<any[]>((acc, { pit, bat, batName, pitName }) => {
       const batSide = batMap.get(bat);
       const pitSide = pitMap.get(pit);
       if (!batSide || !pitSide) return acc;
-
+    
       const pitXw = splitMap.get(`pitcher:${pit}|${batSide}`);
       const batXw = splitMap.get(`batter:${bat}|${pitSide}`);
       if (pitXw != null && batXw != null) {

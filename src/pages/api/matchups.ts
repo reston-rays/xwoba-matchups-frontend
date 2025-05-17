@@ -9,16 +9,21 @@ type Matchup = {
   avg_xwoba: number;
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+type ErrorResponse = { error: string };
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Matchup[] | ErrorResponse>
+) {
   try {
-    // Allow ?date=YYYY-MM-DD, default to today
+    // 1. Determine gameDate
     const dateParam = typeof req.query.date === 'string' ? req.query.date : null;
     const today = new Date().toISOString().slice(0, 10);
     const gameDate = dateParam || today;
 
-    // Fetch top matchups for that date
+    // 2. Query Supabase (no generic on select)
     const { data, error } = await supabaseServer
-      .from<Matchup>('daily_matchups')
+      .from('daily_matchups')
       .select('batter_name, pitcher_name, avg_xwoba')
       .eq('game_date', gameDate)
       .order('avg_xwoba', { ascending: false })
@@ -29,9 +34,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: error.message });
     }
 
-    return res.status(200).json(data ?? []);
-  } catch (err: any) {
+    // 3. Cast to our Matchup[] type
+    const matchups = (data ?? []) as Matchup[];
+    return res.status(200).json(matchups);
+  } catch (err: unknown) {
     console.error('Unexpected error in /api/matchups:', err);
-    return res.status(500).json({ error: err.message });
+    const message = err instanceof Error ? err.message : 'Internal server error';
+    return res.status(500).json({ error: message });
   }
 }
