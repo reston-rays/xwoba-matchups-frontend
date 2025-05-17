@@ -1,7 +1,7 @@
 // src/pages/index.tsx
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseBrowserClient';
 
 type Matchup = {
   batter_name: string;

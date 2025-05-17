@@ -1,6 +1,6 @@
 // src/pages/api/ingest.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseServer } from '@/lib/supabaseServerClient';
 
 // Ensure environment variables are set
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
@@ -11,7 +11,7 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   }  
 
 // Initialize Supabase with service role (server-only)
-const supabase = createClient(
+const supabase = supabaseServer(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
