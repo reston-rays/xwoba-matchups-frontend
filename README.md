@@ -1,36 +1,164 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```markdown
+# xwOBA Matchups (Frontend)
 
-## Getting Started
+This repository contains the Next.js frontend for the xwOBA Matchups app—a lightweight dashboard that displays the top daily expected wOBA (xwOBA) matchups between MLB batters and pitchers.
 
-First, run the development server:
+---
+
+## 📦 Project Structure
+
+```
+
+xwoba-matchups-frontend/
+├── .env.local.example      # Template for required environment variables
+├── public/                 # Static assets (logos, icons, etc.)
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx      # Global layout & header
+│   │   └── page.tsx        # Home page: fetches & displays matchups
+│   ├── lib/
+│   │   ├── supabaseBrowserClient.ts  # Client-only Supabase helper
+│   │   └── supabaseServerClient.ts   # Server-only Supabase helper
+│   └── styles/
+│       └── globals.css
+├── .gitignore
+├── next.config.js
+├── package.json
+└── README.md
+
+````
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repo
+
+```bash
+git clone git@github.com:reston-rays/xwoba-matchups-frontend.git
+cd xwoba-matchups-frontend
+````
+
+### 2. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Configuration
+
+Copy the example environment file and fill in your real keys:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Open `.env.local` and set:
+
+```env
+# Public (browser) variables
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# Private (server) variables
+SUPABASE_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+> **Note:**
+>
+> * `.env.local` is git-ignored and should never be committed.
+> * In Vercel, configure these same four variables under **Project Settings → Environment Variables** (Production only).
+
+---
+
+## 🏃‍♀️ Local Development
+
+Start the dev server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser. The homepage will:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Call your `/api/matchups` endpoint (using `supabaseServerClient` under the hood).
+2. Fetch and render today’s top 20 xwOBA matchups in a table.
+3. Show loading and error states automatically.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🔌 API Routes
 
-To learn more about Next.js, take a look at the following resources:
+* **`GET /api/matchups?date=YYYY-MM-DD`**
+  Returns up to 20 matchups for the given date (defaults to today) in JSON:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  ```json
+  [
+    {
+      "batter_name": "Mookie Betts",
+      "pitcher_name": "Max Scherzer",
+      "avg_xwoba": 0.417
+    },
+    ...
+  ]
+  ```
+* **`POST /api/ingest?date=YYYY-MM-DD`**
+  (Called by infra/cron)
+  Triggers ingestion of daily rosters, probable pitchers, and computes xwOBA matchups into Supabase.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 📦 Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This is designed to deploy on **Vercel**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Connect your GitHub repo to Vercel.
+2. Ensure all four env vars from `.env.local` are set in **Vercel Project Settings → Environment Variables**.
+3. Push to `main`—Vercel will automatically build and deploy your app.
+
+### (Optional) Schedule Daily Ingest
+
+* **Vercel Cron Jobs**:
+  In Vercel’s dashboard under **Settings → Cron Jobs**, add:
+
+  ```
+  URL: https://<your-project>.vercel.app/api/ingest
+  Schedule: 0 13 * * *  # 9 AM ET every day (UTC 13:00)
+  ```
+* **Infra CI**:
+  Alternatively, your infra repo’s GitHub Action can `curl` the deployed ingest endpoint after migrations.
+
+---
+
+## 🎯 Next Steps & Enhancements
+
+* Add a **date picker** on the homepage to view past matchups.
+* Implement **filters** (by team, handedness, xwOBA threshold).
+* Improve UI/UX (team logos, sorting controls, mobile responsiveness).
+* Add **end-to-end tests** (Playwright/Cypress) to verify API & table rendering.
+* (Later) Integrate **authentication** and user-specific watchlists.
+
+---
+
+## ❓ Troubleshooting
+
+* **Blank page or CORS errors**:
+  Ensure your Supabase table `daily_matchups` allows anon `SELECT` in RLS policies, or disable RLS for MVP.
+* **Environment variables not loading**:
+  Restart your dev server after editing `.env.local`. In Vercel, re-deploy after updating vars.
+* **Fetch errors in console**:
+  Check that your `/api/matchups` route is reachable (no 404) and that your Supabase DB has been seeded or ingested with data.
+
+---
+
+## 📄 License
+
+MIT © [reston-rays](https://github.com/reston-rays)
+
+```
+```

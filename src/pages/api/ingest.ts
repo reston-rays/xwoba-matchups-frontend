@@ -2,40 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseServer } from '@/lib/supabaseServerClient';
 
-// Ensure environment variables are set
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_URL');
-  }
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('Missing environment variable: SUPABASE_SERVICE_ROLE_KEY');
-  }  
-
-// Initialize Supabase with service role (server-only)
-const supabase = supabaseServer(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-type Game = {
-  teams: {
-    home: { team: { id: number } };
-    away: { team: { id: number } };
-  };
-  probablePitchers?: {
-    home?: { id: number; fullName: string };
-    away?: { id: number; fullName: string };
-  };
-};
-
-type PlayerDetailsResponse = {
-  people: Array<{
-    id: number;
-    fullName: string;
-    batSide?: { code: string };
-    pitchHand?: { code: string };
-  }>;
-};
-
 // simple fetch with retry
 const fetchWithRetry = async (url: string, retries = 3) => {
   for (let i = 1; i <= retries; i++) {
@@ -46,18 +12,6 @@ const fetchWithRetry = async (url: string, retries = 3) => {
     } catch (err) {
       console.error(`Fetch ${url} (attempt ${i}) failed:`, err);
       if (i === retries) throw err;
-    }
-  }
-};
-
-const upsertWithRetry = async (data: any[], retries = 3) => {
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      await supabase.from('daily_matchups').upsert(data);
-      return;
-    } catch (err) {
-      console.error(`Upsert attempt ${attempt} failed:`, err);
-      if (attempt === retries) throw err;
     }
   }
 };
@@ -73,12 +27,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const sched = await fetchWithRetry(
       `https://statsapi.mlb.com/api/v1/schedule?date=${gameDate}&hydrate=probablePitchers`
     );
-    const games: Game[] = sched.dates?.[0]?.games || [];
-    if (!games.length) return res.status(200).json({ success: true, count: 0 });
+    const games = sched.dates?.[0]?.games || [];
+    if (!games.length) {
+      return res.status(200).json({ success: true, count: 0 });
+    }
 
-    // 3. Roster cache & collect IDs
+    // 3. Build roster cache
     const teamIds = Array.from(
-      new Set(games.flatMap(g => [g.teams.home.team.id, g.teams.away.team.id]))
+      new Set(games.flatMap((g: any) => [g.teams.home.team.id, g.teams.away.team.id]))
     );
     const rosters: Record<number, any[]> = {};
     await Promise.all(
@@ -90,69 +46,64 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     );
 
-    // 4. Collect all player IDs for splits & handedness lookups
-    const batterIds: number[] = [];
-    const pitcherIds: number[] = [];
+    // 4. Gather lookup pairs and unique IDs
     const lookupPairs: Array<{ pit: number; bat: number; batName: string; pitName: string }> = [];
-
+    const playerIds = new Set<number>();
     for (const g of games) {
       const homePid = g.probablePitchers?.home?.id;
       const awayPid = g.probablePitchers?.away?.id;
       if (!homePid || !awayPid) continue;
 
-      rosters[g.teams.home.team.id]?.forEach(p => {
-        batterIds.push(p.person.id);
-        pitcherIds.push(awayPid);
+      rosters[g.teams.home.team.id]?.forEach((p) => {
+        playerIds.add(p.person.id);
+        playerIds.add(awayPid);
         lookupPairs.push({
           pit: awayPid,
           bat: p.person.id,
           batName: p.person.fullName,
-          pitName: g.probablePitchers!.away!.fullName
+          pitName: g.probablePitchers.away.fullName,
         });
       });
-      rosters[g.teams.away.team.id]?.forEach(p => {
-        batterIds.push(p.person.id);
-        pitcherIds.push(homePid);
+      rosters[g.teams.away.team.id]?.forEach((p) => {
+        playerIds.add(p.person.id);
+        playerIds.add(homePid);
         lookupPairs.push({
           pit: homePid,
           bat: p.person.id,
           batName: p.person.fullName,
-          pitName: g.probablePitchers!.home!.fullName
+          pitName: g.probablePitchers.home.fullName,
         });
       });
     }
 
-    const uniquePlayerIds = Array.from(new Set([...batterIds, ...pitcherIds]));
+    const uniquePlayerIds = Array.from(playerIds);
 
-    console.log(`Processing ${games.length} games for date ${gameDate}`);
-    console.log(`Fetched ${uniquePlayerIds.length} unique player IDs`);
-
-    // 5. Fetch all splits in one query
-    const { data: allSplits } = await supabase
+    // 5. Batch‐fetch splits
+    const { data: allSplits } = await supabaseServer
       .from('player_splits')
       .select('player_id, player_type, vs_handedness, xwoba')
-      .in('player_id', uniquePlayerIds)
+      .in('player_id', uniquePlayerIds);
 
-    // 6. Build a map for quick lookup: key = `${type}:${id}|${hand}`
     const splitMap = new Map<string, number>();
-    allSplits?.forEach(s => {
+    (allSplits || []).forEach((s: any) => {
       splitMap.set(`${s.player_type}:${s.player_id}|${s.vs_handedness}`, s.xwoba);
     });
 
-    // 7. Fetch handedness for all needed players
-    const handMaps = { bat: new Map<number, string>(), pit: new Map<number, string>() };
-    const playerDetails = await fetchWithRetry(
+    // 6. Batch‐fetch handedness with one people call
+    const persons = await fetchWithRetry(
       `https://statsapi.mlb.com/api/v1/people?personIds=${uniquePlayerIds.join(',')}`
     );
-    playerDetails.people.forEach(person => {
-      if (person.batSide?.code) handMaps.bat.set(person.id, person.batSide.code);
-      if (person.pitchHand?.code) handMaps.pit.set(person.id, person.pitchHand.code);
+    const batMap = new Map<number, string>();
+    const pitMap = new Map<number, string>();
+    (persons.people || []).forEach((p: any) => {
+      if (p.batSide?.code) batMap.set(p.id, p.batSide.code);
+      if (p.pitchHand?.code) pitMap.set(p.id, p.pitchHand.code);
     });
 
-    // 8. Compute upserts
-    const upserts = lookupPairs.reduce<any[]>((acc, { pit, bat, batName, pitName }) => {
-      const batSide = handMaps.bat.get(bat);
-      const pitSide = handMaps.pit.get(pit);
+    // 7. Build upserts
+    const upserts: any[] = lookupPairs.reduce((acc, { pit, bat, batName, pitName }) => {
+      const batSide = batMap.get(bat);
+      const pitSide = pitMap.get(pit);
       if (!batSide || !pitSide) return acc;
 
       const pitXw = splitMap.get(`pitcher:${pit}|${batSide}`);
@@ -170,24 +121,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return acc;
     }, []);
 
-    console.log(`Upserting ${upserts.length} matchups into the database`);
-
-    // 9. Upsert batched matchups
+    // 8. Upsert
     if (upserts.length) {
-      await upsertWithRetry(upserts);
-    }
-    if (!upserts.length) {
-        console.log('No valid matchups found—nothing to upsert.');
-        return res.status(200).json({ success: true, count: 0 });
+      await supabaseServer.from('daily_matchups').upsert(upserts);
     }
 
     return res.status(200).json({ success: true, count: upserts.length });
-  } catch (err) {
+  } catch (err: any) {
     console.error('Ingest error:', err);
-    return res.status(500).json({
-      error: 'Ingestion failed',
-      message: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-    });
+    return res.status(500).json({ error: err.message });
   }
 }
