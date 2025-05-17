@@ -1,7 +1,7 @@
 // src/pages/index.tsx
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseBrowserClient';
+import { supabaseBrowser } from '@/lib/supabaseBrowserClient';
 
 type Matchup = {
   batter_name: string;
@@ -15,7 +15,7 @@ export default function Home() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    supabase
+    supabaseBrowser
       .from<Matchup>('daily_matchups')
       .select('*')
       .order('avg_xwoba', { ascending: false })
