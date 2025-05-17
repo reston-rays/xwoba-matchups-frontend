@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/api/matchups.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { supabaseBrowser } from '@/lib/supabaseBrowserClient';
+import { supabaseServer } from '@/lib/supabaseServerClient';
 
 type Matchup = {
   batter_name: string;
@@ -22,7 +22,7 @@ export default async function handler(
     const gameDate = dateParam || today;
 
     // 2. Query Supabase (no generic on select)
-    const { data, error } = await supabaseBrowser
+    const { data, error } = await supabaseServer
       .from('daily_matchups')
       .select('batter_name, pitcher_name, avg_xwoba')
       .eq('game_date', gameDate)
