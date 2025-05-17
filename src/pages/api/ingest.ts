@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 2. Fetch schedule + probables
     const sched = await fetchWithRetry(
-      `https://statsapi.mlb.com/api/v1/schedule?date=${gameDate}&sportId=1&hydrate=probablePitchers`
+      `https://statsapi.mlb.com/api/v1/schedule?date=${gameDate}&sportId=1&hydrate=probablePitcher`
     );
     const games = sched.dates?.[0]?.games || [];
     console.log(`Fetched schedule: ${games.length} games found`);
