@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 2. Fetch schedule + probables
     const sched = await fetchWithRetry(
-      `https://statsapi.mlb.com/api/v1/schedule?date=${gameDate}&hydrate=probablePitchers`
+      `https://statsapi.mlb.com/api/v1/schedule?date=${gameDate}&sportId=1&hydrate=probablePitchers`
     );
     const games = sched.dates?.[0]?.games || [];
     if (!games.length) {
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const rosters: Record<number, any[]> = {};
     const rosterPromises = teamIds.map(async (tid: number) => {
       const j = await fetchWithRetry(
-        `https://statsapi.mlb.com/api/v1/teams/${tid}/roster?rosterType=active`
+        `https://statsapi.mlb.com/api/v1/teams/${tid}/roster?rosterType=active&sportId=1`
       );
       rosters[tid] = j.roster; // Store roster by team ID
     });
