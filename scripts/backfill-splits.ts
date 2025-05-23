@@ -34,13 +34,28 @@ type SplitRow = {
   rbi: number | null;
   strikeOuts: number | null;
   stolenBases: number | null;
+  // Pitcher-specific stats
+  inningsPitched: string | null;
+  whip: string | null;
+  battersFaced: number | null;
+  strikeoutsPer9Inn: string | null;
+  walksPer9Inn: string | null;
+  hitsPer9Inn: string | null;
+  homeRunsPer9: string | null;
+  intentionalWalks: number | null;
+  hitByPitch: number | null;
+  groundIntoDoublePlay: number | null;
+  numberOfPitches: number | null;
+  earnedRuns: number | null; 
 };
 
 // If you set TEST_PLAYER_IDS in your env, only those IDs will be backfilled
 const testPlayerIdsEnv = process.env.TEST_PLAYER_IDS;  
+const PREDEFINED_TEST_PITCHER_IDS: number[] = [543037, 675911, 660271]; // Gerrit Cole, Spencer Strider, Shohei Ohtani
 const TEST_PLAYER_IDS: number[] = testPlayerIdsEnv 
   ? testPlayerIdsEnv.split(',').map(s => +s) 
-  : [];
+  : []; // Default to empty if no env var. For testing with predefined pitchers, uncomment the next line:
+// const TEST_PLAYER_IDS: number[] = PREDEFINED_TEST_PITCHER_IDS; 
 
 async function fetchPlayerList(role: 'batter'|'pitcher') {
   // 1. Fetch all teams
@@ -150,12 +165,25 @@ async function fetchSplitsForPlayer(
           atBats: stat.atBats ?? null,
           baseOnBalls: stat.baseOnBalls ?? null,
           homeRuns: stat.homeRuns ?? null,
-          runs: stat.runs ?? stat.rbi ?? null, // API might use "rbi" for runs if "runs" isn't present, or this needs specific check if runs is a different field
+          runs: role === 'pitcher' ? (stat.runs ?? null) : (stat.runs ?? stat.rbi ?? null),
           doubles: stat.doubles ?? null,
           triples: stat.triples ?? null,
           rbi: stat.rbi ?? null,
           strikeOuts: stat.strikeOuts ?? null,
           stolenBases: stat.stolenBases ?? null,
+          // Pitcher-specific stats
+          inningsPitched: role === 'pitcher' ? (stat.inningsPitched ?? null) : null,
+          whip: role === 'pitcher' ? (stat.whip ?? null) : null,
+          battersFaced: role === 'pitcher' ? (stat.battersFaced ?? null) : null,
+          strikeoutsPer9Inn: role === 'pitcher' ? (stat.strikeoutsPer9Inn ?? null) : null,
+          walksPer9Inn: role === 'pitcher' ? (stat.walksPer9Inn ?? null) : null,
+          hitsPer9Inn: role === 'pitcher' ? (stat.hitsPer9Inn ?? null) : null,
+          homeRunsPer9: role === 'pitcher' ? (stat.homeRunsPer9 ?? null) : null,
+          intentionalWalks: role === 'pitcher' ? (stat.intentionalWalks ?? null) : null,
+          hitByPitch: role === 'pitcher' ? (stat.hitByPitch ?? stat.hitBatsmen ?? null) : null,
+          groundIntoDoublePlay: role === 'pitcher' ? (stat.groundIntoDoublePlay ?? null) : null,
+          numberOfPitches: role === 'pitcher' ? (stat.numberOfPitches ?? null) : null,
+          earnedRuns: role === 'pitcher' ? (stat.earnedRuns ?? null) : null,
         } as SplitRow);
       } else {
         console.log(`   ⚠️ No data for player ${playerId} with sitCode ${sitCode} in season ${season}`);
@@ -172,8 +200,8 @@ async function fetchSplitsForPlayer(
 }
 
 async function backfill() {
-  const seasons = [2023]; // Set seasons to [2023] for this test
-  const roles: Array<'batter'|'pitcher'> = ['batter']; // Process only 'batter' role for this test
+  const seasons = [2023, 2024, 2025]; // Set seasons to [2023] for this test
+  const roles: Array<'batter'|'pitcher'> = ['batter', 'pitcher']; // Process only 'batter' role for this test
 
   for (const season of seasons) {
     for (const role of roles) {
