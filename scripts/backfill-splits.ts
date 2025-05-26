@@ -70,6 +70,7 @@ const MLB_API_BASE_URL = 'https://statsapi.mlb.com/api/v1';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const TEST_OUTPUT_DIR = path.join(__dirname, 'test_output'); // Output directory for test files
+const BACKFILL_OUTPUT_DIR = path.join(__dirname, 'backfill_output'); // Output directory for full backfill files
 
 // --- MLB API Response Type Definitions ---
 interface MlbPlayer {
@@ -143,10 +144,10 @@ type SplitRow = {
   groundball_pct: number | null;
   line_drive_pct: number | null;
   // New fields for traditional stats
-  avg: string | null;
-  obp: string | null;
-  slg: string | null;
-  ops: string | null;
+  avg: number | null;
+  obp: number | null;
+  slg: number | null;
+  ops: number | null;
   hits: number | null;
   atBats: number | null;
   baseOnBalls: number | null;
@@ -237,7 +238,7 @@ async function fetchSplitsForTeam(
   role: 'batter' | 'pitcher',
   season: number,
   sitCode: 'vl' | 'vr', // Specific handedness
-  isTestMode: boolean = false
+  options: { saveRawData?: boolean; outputDir?: string } = {}
 ): Promise<SplitRow[]> {
   const results: SplitRow[] = [];
   const params = new URLSearchParams({
@@ -251,6 +252,7 @@ async function fetchSplitsForTeam(
     limit: '2000', // API might paginate for large teams, but 2000 is a high limit
   });
 
+  const { saveRawData = false, outputDir } = options;
   const url = `${MLB_API_BASE_URL}/stats?${params.toString()}`;
 
   try {
@@ -261,14 +263,18 @@ async function fetchSplitsForTeam(
     }
     const json = (await res.json()) as MlbStatsApiResponse;
 
-    if (isTestMode) { // Note: Test mode file saving might need adjustment if called per team/sitCode
-      const rawOutputFileName = `team_${teamId}_${season}_${role}_${sitCode}_raw.json`;
-      const rawOutputFilePath = path.join(TEST_OUTPUT_DIR, rawOutputFileName);
-      try {
-        await fs.writeFile(rawOutputFilePath, JSON.stringify(json, null, 2));
-        console.log(`   💾 Team Raw API response saved to: ${rawOutputFilePath}`);
-      } catch (writeErr) {
-        console.error(`   ❌ Error saving team raw API response to ${rawOutputFilePath}:`, writeErr);
+    if (saveRawData) {
+      if (!outputDir) {
+        console.warn(`   ⚠️ saveRawData is true, but outputDir was not provided for team ${teamId}, sitCode ${sitCode}. Raw data will not be saved.`);
+      } else {
+        const rawOutputFileName = `team_${teamId}_${season}_${role}_${sitCode}_raw.json`;
+        const rawOutputFilePath = path.join(outputDir, rawOutputFileName);
+        try {
+          await fs.writeFile(rawOutputFilePath, JSON.stringify(json, null, 2));
+          console.log(`   💾 Raw API response for team ${teamId} (${sitCode}) saved to: ${rawOutputFilePath}`);
+        } catch (writeErr) {
+          console.error(`   ❌ Error saving raw API response for team ${teamId} (${sitCode}) to ${rawOutputFilePath}:`, writeErr);
+        }
       }
     }
 
@@ -289,8 +295,11 @@ async function fetchSplitsForTeam(
           vs_handedness: sitCode === 'vl' ? 'L' : 'R',
           xwoba: null, launch_angle: null,
           groundball_pct: totalBattedBalls > 0 ? groundOuts / totalBattedBalls : null,
-          line_drive_pct: null,
-          avg: stat.avg ?? null, obp: stat.obp ?? null, slg: stat.slg ?? null, ops: stat.ops ?? null,
+          line_drive_pct: null, // Note: lineDrives not directly available in team stats splits
+          avg: stat.avg && stat.avg !== '--' ? parseFloat(stat.avg) : null,
+          obp: stat.obp && stat.obp !== '--' ? parseFloat(stat.obp) : null,
+          slg: stat.slg && stat.slg !== '--' ? parseFloat(stat.slg) : null,
+          ops: stat.ops && stat.ops !== '--' ? parseFloat(stat.ops) : null,
           hits: stat.hits ?? null, atBats: stat.atBats ?? null, baseOnBalls: stat.baseOnBalls ?? null,
           homeRuns: stat.homeRuns ?? null, runs: stat.runs ?? null, doubles: stat.doubles ?? null,
           triples: stat.triples ?? null, rbi: stat.rbi ?? null, strikeOuts: stat.strikeOuts ?? null,
@@ -367,13 +376,13 @@ async function fetchSplitsForPlayer(
           vs_handedness: sitCode === 'vl' ? 'L' : 'R',
           xwoba: null,
           launch_angle: null,
-          groundball_pct: totalBattedBalls > 0 ? groundOuts / totalBattedBalls : null,
-          line_drive_pct: null,
-          // Populate new fields
-          avg: stat.avg ?? null,
-          obp: stat.obp ?? null,
-          slg: stat.slg ?? null,
-          ops: stat.ops ?? null,
+          groundball_pct: totalBattedBalls > 0 ? groundOuts / totalBattedBalls : null, // Uses groundOuts/airOuts
+          line_drive_pct: null, // Note: lineDrives not directly available in player stats splits in this specific API structure.
+                                // If MlbPlayerStat had 'lineDrives' and 'bip' (balls in play), it could be calculated.
+          avg: stat.avg && stat.avg !== '--' ? parseFloat(stat.avg) : null,
+          obp: stat.obp && stat.obp !== '--' ? parseFloat(stat.obp) : null,
+          slg: stat.slg && stat.slg !== '--' ? parseFloat(stat.slg) : null,
+          ops: stat.ops && stat.ops !== '--' ? parseFloat(stat.ops) : null,
           hits: stat.hits ?? null,
           atBats: stat.atBats ?? null,
           baseOnBalls: stat.baseOnBalls ?? null,
@@ -436,6 +445,8 @@ async function main() {
     .alias('help', 'h')
     .argv;
 
+  let allParsedSplitsForRun: SplitRow[] = []; // Accumulator for all parsed data in this run
+
   let seasonsToProcess: number[];
   let rolesToProcess: Array<'batter' | 'pitcher'>;
   let playerIdsToProcess: number[] | undefined;
@@ -458,8 +469,13 @@ async function main() {
 
       for (const sitCode of handednessCodes) {
         console.log(`  🔄 Fetching ${teamTestCase.role} splits for team ${teamTestCase.teamId} (vs ${sitCode === 'vl' ? 'L' : 'R'}) in ${teamTestCase.season}`);
-        // `fetchSplitsForTeam` already saves its own raw data if isTestMode is true
-        const teamSplits = await fetchSplitsForTeam(teamTestCase.teamId, teamTestCase.role, teamTestCase.season, sitCode, true);
+        const teamSplits = await fetchSplitsForTeam(
+          teamTestCase.teamId,
+          teamTestCase.role,
+          teamTestCase.season,
+          sitCode,
+          { saveRawData: true, outputDir: TEST_OUTPUT_DIR }
+        );
         if (teamSplits.length > 0) {
           console.log(`   ✅ Fetched ${teamSplits.length} ${teamTestCase.role} split rows for team ${teamTestCase.teamId} (vs ${sitCode === 'vl' ? 'L' : 'R'})`);
           allTeamSplitsForCase = allTeamSplitsForCase.concat(teamSplits);
@@ -467,15 +483,22 @@ async function main() {
           console.log(`   ⚠️ No splits data returned for team ${teamTestCase.teamId} (vs ${sitCode === 'vl' ? 'L' : 'R'}) in ${teamTestCase.season} as ${teamTestCase.role}`);
         }
       }
+      // Accumulate splits from this test case into the run's total
       if (allTeamSplitsForCase.length > 0) {
-        const parsedOutputFileName = `team_${teamTestCase.teamId}_${teamTestCase.season}_${teamTestCase.role}_parsed.json`;
-        const parsedOutputFilePath = path.join(TEST_OUTPUT_DIR, parsedOutputFileName);
-        try {
-          await fs.writeFile(parsedOutputFilePath, JSON.stringify(allTeamSplitsForCase, null, 2));
-          console.log(`   💾 Team Parsed data (all handedness) saved to: ${parsedOutputFilePath}`);
-        } catch (writeErr) {
-          console.error(`   ❌ Error saving team parsed data to ${parsedOutputFilePath}:`, writeErr);
-        }
+        allParsedSplitsForRun = allParsedSplitsForRun.concat(allTeamSplitsForCase);
+        console.log(`   ➕ Added ${allTeamSplitsForCase.length} splits from ${teamTestCase.description} to the run total.`);
+      }
+    }
+
+    // Save all accumulated parsed data for the test run
+    if (allParsedSplitsForRun.length > 0) {
+      const parsedOutputFileName = `test_run_all_parsed_data.json`;
+      const parsedOutputFilePath = path.join(TEST_OUTPUT_DIR, parsedOutputFileName);
+      try {
+        await fs.writeFile(parsedOutputFilePath, JSON.stringify(allParsedSplitsForRun, null, 2));
+        console.log(`\n   💾 All ${allParsedSplitsForRun.length} parsed splits for test run saved to: ${parsedOutputFilePath}`);
+      } catch (writeErr) {
+        console.error(`   ❌ Error saving all parsed test data to ${parsedOutputFilePath}:`, writeErr);
       }
     }
     console.log('\n🎉 Test mode complete');
@@ -502,8 +525,9 @@ async function main() {
           console.log(`  🔄 Fetching splits for individual player ${role} ${player.id} in ${season}`);
           const individualSplits = await fetchSplitsForPlayer(player.id, role, season); // isTestMode is false here
           if (individualSplits.length > 0) {
+            allParsedSplitsForRun = allParsedSplitsForRun.concat(individualSplits);
             // TODO: Upsert individualSplits to Supabase
-            console.log(`   ✅ Fetched ${individualSplits.length} split rows for player ${player.id} (Supabase upsert commented out)`);
+            console.log(`   ✅ Fetched and added ${individualSplits.length} split rows for player ${player.id} to run total (Supabase upsert commented out)`);
           } else {
             console.log(`   ⚠️ No splits data returned for player ${player.id} in ${season} as ${role}`);
           }
@@ -520,16 +544,48 @@ async function main() {
 
         for (const teamId of teamIds) {
           console.log(`  🔄 Fetching ${role} splits for team ${teamId} in ${season}`);
+          let allTeamSplitsForSeasonRoleTeam: SplitRow[] = [];
           const handednessCodes: Array<'vl' | 'vr'> = ['vl', 'vr'];
+
           for (const sitCode of handednessCodes) {
-            const teamSplits = await fetchSplitsForTeam(teamId, role, season, sitCode); // isTestMode is false here
+            const teamSplits = await fetchSplitsForTeam(
+              teamId,
+              role,
+              season,
+              sitCode,
+              { saveRawData: true, outputDir: BACKFILL_OUTPUT_DIR }
+            );
             if (teamSplits.length > 0) {
               // TODO: Upsert teamSplits to Supabase
               console.log(`   ✅ Fetched ${teamSplits.length} ${role} split rows for team ${teamId} (vs ${sitCode === 'vl' ? 'L' : 'R'}) (Supabase upsert commented out)`);
-            } // No "no data" message here to avoid verbosity, as it's per handedness
+              allTeamSplitsForSeasonRoleTeam = allTeamSplitsForSeasonRoleTeam.concat(teamSplits);
+            }
+          }
+          if (allTeamSplitsForSeasonRoleTeam.length > 0) {
+            allParsedSplitsForRun = allParsedSplitsForRun.concat(allTeamSplitsForSeasonRoleTeam);
+            console.log(`   ➕ Added ${allTeamSplitsForSeasonRoleTeam.length} splits for team ${teamId} (season ${season}, role ${role}) to the run total.`);
           }
         }
       }
+    }
+  }
+
+  // Save all accumulated parsed data for the non-test run (full backfill or specific players)
+  if (!argv.test && allParsedSplitsForRun.length > 0) {
+    try {
+      await fs.mkdir(BACKFILL_OUTPUT_DIR, { recursive: true });
+      console.log(`\n   📂 Output directory for parsed data ensured at: ${BACKFILL_OUTPUT_DIR}`);
+    } catch (dirErr) {
+      console.error(`   ❌ Error creating output directory ${BACKFILL_OUTPUT_DIR}:`, dirErr);
+      // Potentially skip saving if directory creation fails, or exit
+    }
+    const parsedOutputFileName = `run_all_parsed_data.json`;
+    const parsedOutputFilePath = path.join(BACKFILL_OUTPUT_DIR, parsedOutputFileName);
+    try {
+      await fs.writeFile(parsedOutputFilePath, JSON.stringify(allParsedSplitsForRun, null, 2));
+      console.log(`   💾 All ${allParsedSplitsForRun.length} parsed splits for this run saved to: ${parsedOutputFilePath}`);
+    } catch (writeErr) {
+      console.error(`   ❌ Error saving all parsed data for this run to ${parsedOutputFilePath}:`, writeErr);
     }
   }
 
