@@ -1,0 +1,1516 @@
+{
+  "copyright": "Copyright 2025 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "stats": [
+    {
+      "type": {
+        "displayName": "statSplits"
+      },
+      "group": {
+        "displayName": "hitting"
+      },
+      "totalSplits": 22,
+      "exemptions": [],
+      "splits": [
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 5,
+            "groundOuts": 3,
+            "airOuts": 2,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 1,
+            "baseOnBalls": 1,
+            "intentionalWalks": 0,
+            "hits": 4,
+            "hitByPitch": 0,
+            "avg": ".400",
+            "atBats": 10,
+            "obp": ".455",
+            "slg": ".400",
+            "ops": ".855",
+            "groundIntoDoublePlay": 1,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 43,
+            "plateAppearances": 11,
+            "totalBases": 4,
+            "rbi": 1,
+            "leftOnBase": 1,
+            "sacBunts": 0,
+            "sacFlies": 0,
+            "babip": ".444",
+            "groundOutsToAirouts": "1.50",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "-.--"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 676439,
+            "fullName": "Hunter Feduccia",
+            "link": "/api/v1/people/676439",
+            "firstName": "Hunter",
+            "lastName": "Feduccia"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 1,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "3",
+            "name": "First Base",
+            "type": "Infielder",
+            "abbreviation": "1B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 145,
+            "groundOuts": 76,
+            "airOuts": 102,
+            "doubles": 26,
+            "triples": 5,
+            "homeRuns": 42,
+            "strikeOuts": 104,
+            "baseOnBalls": 61,
+            "intentionalWalks": 10,
+            "hits": 132,
+            "hitByPitch": 4,
+            "avg": ".322",
+            "atBats": 410,
+            "obp": ".411",
+            "slg": ".717",
+            "ops": "1.128",
+            "groundIntoDoublePlay": 3,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1880,
+            "plateAppearances": 482,
+            "totalBases": 294,
+            "rbi": 91,
+            "leftOnBase": 143,
+            "sacBunts": 0,
+            "sacFlies": 4,
+            "babip": ".336",
+            "groundOutsToAirouts": "0.75",
+            "catchersInterference": 3,
+            "atBatsPerHomeRun": "9.76"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 660271,
+            "fullName": "Shohei Ohtani",
+            "link": "/api/v1/people/660271",
+            "firstName": "Shohei",
+            "lastName": "Ohtani"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 2,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "Y",
+            "name": "Two-Way Player",
+            "type": "Two-Way Player",
+            "abbreviation": "TWP"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 133,
+            "groundOuts": 84,
+            "airOuts": 98,
+            "doubles": 24,
+            "triples": 1,
+            "homeRuns": 15,
+            "strikeOuts": 66,
+            "baseOnBalls": 58,
+            "intentionalWalks": 8,
+            "hits": 105,
+            "hitByPitch": 4,
+            "avg": ".300",
+            "atBats": 350,
+            "obp": ".402",
+            "slg": ".503",
+            "ops": ".905",
+            "groundIntoDoublePlay": 7,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1673,
+            "plateAppearances": 415,
+            "totalBases": 176,
+            "rbi": 61,
+            "leftOnBase": 142,
+            "sacBunts": 0,
+            "sacFlies": 3,
+            "babip": ".331",
+            "groundOutsToAirouts": "0.86",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "23.33"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 518692,
+            "fullName": "Freddie Freeman",
+            "link": "/api/v1/people/518692",
+            "firstName": "Frederick",
+            "lastName": "Freeman"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 3,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "3",
+            "name": "First Base",
+            "type": "Infielder",
+            "abbreviation": "1B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 84,
+            "groundOuts": 68,
+            "airOuts": 55,
+            "doubles": 15,
+            "triples": 0,
+            "homeRuns": 4,
+            "strikeOuts": 23,
+            "baseOnBalls": 15,
+            "intentionalWalks": 0,
+            "hits": 60,
+            "hitByPitch": 2,
+            "avg": ".296",
+            "atBats": 203,
+            "obp": ".348",
+            "slg": ".429",
+            "ops": ".777",
+            "groundIntoDoublePlay": 4,
+            "groundIntoTriplePlay": 1,
+            "numberOfPitches": 782,
+            "plateAppearances": 223,
+            "totalBases": 87,
+            "rbi": 23,
+            "leftOnBase": 87,
+            "sacBunts": 2,
+            "sacFlies": 1,
+            "babip": ".316",
+            "groundOutsToAirouts": "1.24",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "50.75"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 500743,
+            "fullName": "Miguel Rojas",
+            "link": "/api/v1/people/500743",
+            "firstName": "Miguel",
+            "lastName": "Rojas"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 4,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "4",
+            "name": "Second Base",
+            "type": "Infielder",
+            "abbreviation": "2B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 108,
+            "groundOuts": 60,
+            "airOuts": 119,
+            "doubles": 16,
+            "triples": 3,
+            "homeRuns": 15,
+            "strikeOuts": 44,
+            "baseOnBalls": 44,
+            "intentionalWalks": 0,
+            "hits": 86,
+            "hitByPitch": 1,
+            "avg": ".280",
+            "atBats": 307,
+            "obp": ".370",
+            "slg": ".498",
+            "ops": ".868",
+            "groundIntoDoublePlay": 4,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1408,
+            "plateAppearances": 354,
+            "totalBases": 153,
+            "rbi": 51,
+            "leftOnBase": 99,
+            "sacBunts": 0,
+            "sacFlies": 2,
+            "babip": ".284",
+            "groundOutsToAirouts": "0.50",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "20.47"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 605141,
+            "fullName": "Mookie Betts",
+            "link": "/api/v1/people/605141",
+            "firstName": "Markus",
+            "lastName": "Betts"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 5,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "6",
+            "name": "Shortstop",
+            "type": "Infielder",
+            "abbreviation": "SS"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 144,
+            "groundOuts": 92,
+            "airOuts": 86,
+            "doubles": 23,
+            "triples": 1,
+            "homeRuns": 22,
+            "strikeOuts": 142,
+            "baseOnBalls": 39,
+            "intentionalWalks": 0,
+            "hits": 115,
+            "hitByPitch": 6,
+            "avg": ".265",
+            "atBats": 434,
+            "obp": ".333",
+            "slg": ".475",
+            "ops": ".808",
+            "groundIntoDoublePlay": 3,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1964,
+            "plateAppearances": 481,
+            "totalBases": 206,
+            "rbi": 71,
+            "leftOnBase": 216,
+            "sacBunts": 0,
+            "sacFlies": 1,
+            "babip": ".343",
+            "groundOutsToAirouts": "1.07",
+            "catchersInterference": 1,
+            "atBatsPerHomeRun": "19.73"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 606192,
+            "fullName": "Teoscar Hernández",
+            "link": "/api/v1/people/606192",
+            "firstName": "Teoscar",
+            "lastName": "Hernández"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 6,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "9",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "RF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 137,
+            "groundOuts": 107,
+            "airOuts": 92,
+            "doubles": 23,
+            "triples": 2,
+            "homeRuns": 10,
+            "strikeOuts": 93,
+            "baseOnBalls": 41,
+            "intentionalWalks": 0,
+            "hits": 103,
+            "hitByPitch": 1,
+            "avg": ".262",
+            "atBats": 393,
+            "obp": ".332",
+            "slg": ".407",
+            "ops": ".739",
+            "groundIntoDoublePlay": 7,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1748,
+            "plateAppearances": 437,
+            "totalBases": 160,
+            "rbi": 48,
+            "leftOnBase": 167,
+            "sacBunts": 0,
+            "sacFlies": 2,
+            "babip": ".318",
+            "groundOutsToAirouts": "1.16",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "39.30"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 666158,
+            "fullName": "Gavin Lux",
+            "link": "/api/v1/people/666158",
+            "firstName": "Gavin",
+            "lastName": "Lux"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 7,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "7",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "LF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 71,
+            "groundOuts": 21,
+            "airOuts": 58,
+            "doubles": 14,
+            "triples": 0,
+            "homeRuns": 10,
+            "strikeOuts": 55,
+            "baseOnBalls": 38,
+            "intentionalWalks": 3,
+            "hits": 44,
+            "hitByPitch": 1,
+            "avg": ".254",
+            "atBats": 173,
+            "obp": ".382",
+            "slg": ".509",
+            "ops": ".891",
+            "groundIntoDoublePlay": 0,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 901,
+            "plateAppearances": 217,
+            "totalBases": 88,
+            "rbi": 41,
+            "leftOnBase": 100,
+            "sacBunts": 0,
+            "sacFlies": 5,
+            "babip": ".301",
+            "groundOutsToAirouts": "0.36",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "17.30"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 571970,
+            "fullName": "Max Muncy",
+            "link": "/api/v1/people/571970",
+            "firstName": "Maxwell",
+            "lastName": "Muncy"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 8,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "5",
+            "name": "Third Base",
+            "type": "Infielder",
+            "abbreviation": "3B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 121,
+            "groundOuts": 67,
+            "airOuts": 118,
+            "doubles": 14,
+            "triples": 2,
+            "homeRuns": 12,
+            "strikeOuts": 82,
+            "baseOnBalls": 31,
+            "intentionalWalks": 0,
+            "hits": 84,
+            "hitByPitch": 7,
+            "avg": ".244",
+            "atBats": 344,
+            "obp": ".314",
+            "slg": ".401",
+            "ops": ".715",
+            "groundIntoDoublePlay": 4,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1660,
+            "plateAppearances": 389,
+            "totalBases": 138,
+            "rbi": 54,
+            "leftOnBase": 152,
+            "sacBunts": 0,
+            "sacFlies": 7,
+            "babip": ".280",
+            "groundOutsToAirouts": "0.57",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "28.67"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 669257,
+            "fullName": "Will Smith",
+            "link": "/api/v1/people/669257",
+            "firstName": "William",
+            "lastName": "Smith"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 9,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "2",
+            "name": "Catcher",
+            "type": "Catcher",
+            "abbreviation": "C"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 99,
+            "groundOuts": 46,
+            "airOuts": 83,
+            "doubles": 11,
+            "triples": 0,
+            "homeRuns": 6,
+            "strikeOuts": 50,
+            "baseOnBalls": 19,
+            "intentionalWalks": 0,
+            "hits": 51,
+            "hitByPitch": 0,
+            "avg": ".226",
+            "atBats": 226,
+            "obp": ".282",
+            "slg": ".354",
+            "ops": ".636",
+            "groundIntoDoublePlay": 6,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 961,
+            "plateAppearances": 249,
+            "totalBases": 80,
+            "rbi": 30,
+            "leftOnBase": 102,
+            "sacBunts": 1,
+            "sacFlies": 3,
+            "babip": ".260",
+            "groundOutsToAirouts": "0.55",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "37.67"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 571771,
+            "fullName": "Enrique Hernández",
+            "link": "/api/v1/people/571771",
+            "firstName": "Enrique",
+            "lastName": "Hernández"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 10,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "3",
+            "name": "First Base",
+            "type": "Infielder",
+            "abbreviation": "1B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 42,
+            "groundOuts": 29,
+            "airOuts": 21,
+            "doubles": 1,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 30,
+            "baseOnBalls": 10,
+            "intentionalWalks": 0,
+            "hits": 23,
+            "hitByPitch": 0,
+            "avg": ".225",
+            "atBats": 102,
+            "obp": ".295",
+            "slg": ".265",
+            "ops": ".560",
+            "groundIntoDoublePlay": 3,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 439,
+            "plateAppearances": 113,
+            "totalBases": 27,
+            "rbi": 7,
+            "leftOnBase": 44,
+            "sacBunts": 1,
+            "sacFlies": 0,
+            "babip": ".310",
+            "groundOutsToAirouts": "1.38",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "102.00"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 605131,
+            "fullName": "Austin Barnes",
+            "link": "/api/v1/people/605131",
+            "firstName": "Austin",
+            "lastName": "Barnes"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 11,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "2",
+            "name": "Catcher",
+            "type": "Catcher",
+            "abbreviation": "C"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 63,
+            "groundOuts": 27,
+            "airOuts": 30,
+            "doubles": 6,
+            "triples": 0,
+            "homeRuns": 3,
+            "strikeOuts": 46,
+            "baseOnBalls": 15,
+            "intentionalWalks": 0,
+            "hits": 28,
+            "hitByPitch": 2,
+            "avg": ".214",
+            "atBats": 131,
+            "obp": ".304",
+            "slg": ".328",
+            "ops": ".632",
+            "groundIntoDoublePlay": 1,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 633,
+            "plateAppearances": 148,
+            "totalBases": 43,
+            "rbi": 16,
+            "leftOnBase": 64,
+            "sacBunts": 0,
+            "sacFlies": 0,
+            "babip": ".305",
+            "groundOutsToAirouts": "0.90",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "43.67"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 621035,
+            "fullName": "Chris Taylor",
+            "link": "/api/v1/people/621035",
+            "firstName": "Christopher",
+            "lastName": "Taylor"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 12,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "7",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "LF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 108,
+            "groundOuts": 51,
+            "airOuts": 108,
+            "doubles": 16,
+            "triples": 1,
+            "homeRuns": 10,
+            "strikeOuts": 84,
+            "baseOnBalls": 22,
+            "intentionalWalks": 0,
+            "hits": 65,
+            "hitByPitch": 6,
+            "avg": ".213",
+            "atBats": 305,
+            "obp": ".277",
+            "slg": ".370",
+            "ops": ".647",
+            "groundIntoDoublePlay": 7,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 1321,
+            "plateAppearances": 336,
+            "totalBases": 113,
+            "rbi": 37,
+            "leftOnBase": 150,
+            "sacBunts": 0,
+            "sacFlies": 3,
+            "babip": ".257",
+            "groundOutsToAirouts": "0.47",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "30.50"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 681624,
+            "fullName": "Andy Pages",
+            "link": "/api/v1/people/681624",
+            "firstName": "Andy",
+            "lastName": "Pages"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 13,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "8",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "CF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 22,
+            "groundOuts": 11,
+            "airOuts": 12,
+            "doubles": 2,
+            "triples": 1,
+            "homeRuns": 1,
+            "strikeOuts": 19,
+            "baseOnBalls": 2,
+            "intentionalWalks": 0,
+            "hits": 11,
+            "hitByPitch": 1,
+            "avg": ".212",
+            "atBats": 52,
+            "obp": ".255",
+            "slg": ".346",
+            "ops": ".601",
+            "groundIntoDoublePlay": 1,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 203,
+            "plateAppearances": 56,
+            "totalBases": 18,
+            "rbi": 7,
+            "leftOnBase": 19,
+            "sacBunts": 1,
+            "sacFlies": 0,
+            "babip": ".313",
+            "groundOutsToAirouts": "0.92",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "52.00"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 595281,
+            "fullName": "Kevin Kiermaier",
+            "link": "/api/v1/people/595281",
+            "firstName": "Kevin",
+            "lastName": "Kiermaier"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 14,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "8",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "CF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 12,
+            "groundOuts": 5,
+            "airOuts": 11,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 11,
+            "baseOnBalls": 1,
+            "intentionalWalks": 0,
+            "hits": 7,
+            "hitByPitch": 0,
+            "avg": ".206",
+            "atBats": 34,
+            "obp": ".229",
+            "slg": ".294",
+            "ops": ".523",
+            "groundIntoDoublePlay": 0,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 129,
+            "plateAppearances": 35,
+            "totalBases": 10,
+            "rbi": 1,
+            "leftOnBase": 17,
+            "sacBunts": 0,
+            "sacFlies": 0,
+            "babip": ".273",
+            "groundOutsToAirouts": "0.45",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "34.00"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 605113,
+            "fullName": "Nick Ahmed",
+            "link": "/api/v1/people/605113",
+            "firstName": "Nicholas",
+            "lastName": "Ahmed"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 15,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "6",
+            "name": "Shortstop",
+            "type": "Infielder",
+            "abbreviation": "SS"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 26,
+            "groundOuts": 12,
+            "airOuts": 17,
+            "doubles": 1,
+            "triples": 0,
+            "homeRuns": 3,
+            "strikeOuts": 24,
+            "baseOnBalls": 8,
+            "intentionalWalks": 0,
+            "hits": 13,
+            "hitByPitch": 2,
+            "avg": ".203",
+            "atBats": 64,
+            "obp": ".311",
+            "slg": ".359",
+            "ops": ".670",
+            "groundIntoDoublePlay": 0,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 342,
+            "plateAppearances": 77,
+            "totalBases": 23,
+            "rbi": 9,
+            "leftOnBase": 33,
+            "sacBunts": 2,
+            "sacFlies": 0,
+            "babip": ".270",
+            "groundOutsToAirouts": "0.71",
+            "catchersInterference": 1,
+            "atBatsPerHomeRun": "21.33"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 624415,
+            "fullName": "Cavan Biggio",
+            "link": "/api/v1/people/624415",
+            "firstName": "Cavan",
+            "lastName": "Biggio"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 16,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "4",
+            "name": "Second Base",
+            "type": "Infielder",
+            "abbreviation": "2B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 62,
+            "groundOuts": 59,
+            "airOuts": 41,
+            "doubles": 10,
+            "triples": 2,
+            "homeRuns": 5,
+            "strikeOuts": 31,
+            "baseOnBalls": 17,
+            "intentionalWalks": 0,
+            "hits": 32,
+            "hitByPitch": 4,
+            "avg": ".200",
+            "atBats": 160,
+            "obp": ".288",
+            "slg": ".381",
+            "ops": ".669",
+            "groundIntoDoublePlay": 3,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 732,
+            "plateAppearances": 184,
+            "totalBases": 61,
+            "rbi": 26,
+            "leftOnBase": 70,
+            "sacBunts": 0,
+            "sacFlies": 3,
+            "babip": ".213",
+            "groundOutsToAirouts": "1.44",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "32.00"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 518792,
+            "fullName": "Jason Heyward",
+            "link": "/api/v1/people/518792",
+            "firstName": "Jason",
+            "lastName": "Heyward"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 17,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "7",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "LF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 37,
+            "groundOuts": 33,
+            "airOuts": 30,
+            "doubles": 3,
+            "triples": 0,
+            "homeRuns": 2,
+            "strikeOuts": 24,
+            "baseOnBalls": 10,
+            "intentionalWalks": 0,
+            "hits": 19,
+            "hitByPitch": 1,
+            "avg": ".181",
+            "atBats": 105,
+            "obp": ".256",
+            "slg": ".267",
+            "ops": ".523",
+            "groundIntoDoublePlay": 2,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 453,
+            "plateAppearances": 117,
+            "totalBases": 28,
+            "rbi": 13,
+            "leftOnBase": 40,
+            "sacBunts": 0,
+            "sacFlies": 1,
+            "babip": ".213",
+            "groundOutsToAirouts": "1.10",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "52.50"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 669242,
+            "fullName": "Tommy Edman",
+            "link": "/api/v1/people/669242",
+            "firstName": "Thomas",
+            "lastName": "Edman"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 18,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "4",
+            "name": "Second Base",
+            "type": "Infielder",
+            "abbreviation": "2B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 20,
+            "groundOuts": 5,
+            "airOuts": 14,
+            "doubles": 2,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 10,
+            "baseOnBalls": 5,
+            "intentionalWalks": 0,
+            "hits": 6,
+            "hitByPitch": 0,
+            "avg": ".176",
+            "atBats": 34,
+            "obp": ".275",
+            "slg": ".324",
+            "ops": ".599",
+            "groundIntoDoublePlay": 1,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 176,
+            "plateAppearances": 40,
+            "totalBases": 11,
+            "rbi": 5,
+            "leftOnBase": 18,
+            "sacBunts": 0,
+            "sacFlies": 1,
+            "babip": ".208",
+            "groundOutsToAirouts": "0.36",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "34.00"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 678246,
+            "fullName": "Miguel Vargas",
+            "link": "/api/v1/people/678246",
+            "firstName": "Miguel",
+            "lastName": "Vargas"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 19,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "5",
+            "name": "Third Base",
+            "type": "Infielder",
+            "abbreviation": "3B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 51,
+            "groundOuts": 21,
+            "airOuts": 35,
+            "doubles": 4,
+            "triples": 0,
+            "homeRuns": 4,
+            "strikeOuts": 47,
+            "baseOnBalls": 14,
+            "intentionalWalks": 0,
+            "hits": 18,
+            "hitByPitch": 4,
+            "avg": ".149",
+            "atBats": 121,
+            "obp": ".259",
+            "slg": ".281",
+            "ops": ".540",
+            "groundIntoDoublePlay": 0,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 567,
+            "plateAppearances": 139,
+            "totalBases": 34,
+            "rbi": 11,
+            "leftOnBase": 71,
+            "sacBunts": 0,
+            "sacFlies": 0,
+            "babip": ".200",
+            "groundOutsToAirouts": "0.60",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "30.25"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 681546,
+            "fullName": "James Outman",
+            "link": "/api/v1/people/681546",
+            "firstName": "James",
+            "lastName": "Outman"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 20,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "8",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "CF"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 2,
+            "groundOuts": 3,
+            "airOuts": 0,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 2,
+            "baseOnBalls": 0,
+            "intentionalWalks": 0,
+            "hits": 0,
+            "hitByPitch": 0,
+            "avg": ".000",
+            "atBats": 5,
+            "obp": ".000",
+            "slg": ".000",
+            "ops": ".000",
+            "groundIntoDoublePlay": 0,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 14,
+            "plateAppearances": 5,
+            "totalBases": 0,
+            "rbi": 0,
+            "leftOnBase": 4,
+            "sacBunts": 0,
+            "sacFlies": 0,
+            "babip": ".000",
+            "groundOutsToAirouts": "3.00",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "-.--"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 642708,
+            "fullName": "Amed Rosario",
+            "link": "/api/v1/people/642708",
+            "firstName": "German",
+            "lastName": "Rosario"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 21,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "5",
+            "name": "Third Base",
+            "type": "Infielder",
+            "abbreviation": "3B"
+          }
+        },
+        {
+          "season": "2024",
+          "stat": {
+            "gamesPlayed": 3,
+            "groundOuts": 1,
+            "airOuts": 2,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 3,
+            "baseOnBalls": 0,
+            "intentionalWalks": 0,
+            "hits": 0,
+            "hitByPitch": 0,
+            "avg": ".000",
+            "atBats": 6,
+            "obp": ".000",
+            "slg": ".000",
+            "ops": ".000",
+            "groundIntoDoublePlay": 0,
+            "groundIntoTriplePlay": 0,
+            "numberOfPitches": 27,
+            "plateAppearances": 6,
+            "totalBases": 0,
+            "rbi": 0,
+            "leftOnBase": 2,
+            "sacBunts": 0,
+            "sacFlies": 0,
+            "babip": ".000",
+            "groundOutsToAirouts": "0.50",
+            "catchersInterference": 0,
+            "atBatsPerHomeRun": "-.--"
+          },
+          "team": {
+            "id": 119,
+            "name": "Los Angeles Dodgers",
+            "link": "/api/v1/teams/119"
+          },
+          "player": {
+            "id": 666211,
+            "fullName": "Taylor Trammell",
+            "link": "/api/v1/people/666211",
+            "firstName": "Taylor",
+            "lastName": "Trammell"
+          },
+          "league": {
+            "id": 104,
+            "name": "National League",
+            "link": "/api/v1/league/104"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 21,
+          "split": {
+            "code": "vr",
+            "description": "vs Right",
+            "sortOrder": 74
+          },
+          "position": {
+            "code": "7",
+            "name": "Outfielder",
+            "type": "Outfielder",
+            "abbreviation": "LF"
+          }
+        }
+      ],
+      "splitsTiedWithOffset": [],
+      "splitsTiedWithLimit": [],
+      "playerPool": "ALL"
+    }
+  ]
+}

@@ -1,0 +1,1964 @@
+{
+  "copyright": "Copyright 2025 MLB Advanced Media, L.P.  Use of any content on this page acknowledges agreement to the terms posted here http://gdx.mlb.com/components/copyright.txt",
+  "stats": [
+    {
+      "type": {
+        "displayName": "statSplits"
+      },
+      "group": {
+        "displayName": "pitching"
+      },
+      "totalSplits": 24,
+      "exemptions": [],
+      "splits": [
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 61,
+            "groundOuts": 18,
+            "airOuts": 34,
+            "doubles": 2,
+            "triples": 0,
+            "homeRuns": 2,
+            "strikeOuts": 32,
+            "baseOnBalls": 15,
+            "intentionalWalks": 0,
+            "hits": 16,
+            "hitByPitch": 0,
+            "avg": ".163",
+            "atBats": 98,
+            "obp": ".272",
+            "slg": ".245",
+            "ops": ".517",
+            "groundIntoDoublePlay": 2,
+            "numberOfPitches": 478,
+            "inningsPitched": "29.1",
+            "outsPitched": 88,
+            "whip": "1.06",
+            "battersFaced": 115,
+            "outs": 88,
+            "gamesPitched": 61,
+            "balls": 181,
+            "strikes": 297,
+            "strikePercentage": ".620",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 24,
+            "groundOutsToAirouts": "0.53",
+            "rbi": 4,
+            "pitchesPerInning": "16.30",
+            "strikeoutWalkRatio": "2.13",
+            "strikeoutsPer9Inn": "9.82",
+            "walksPer9Inn": "4.60",
+            "hitsPer9Inn": "4.91",
+            "homeRunsPer9": "0.61",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 1
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 593576,
+            "fullName": "Héctor Neris",
+            "link": "/api/v1/people/593576",
+            "firstName": "Héctor",
+            "lastName": "Neris"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 1,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 31,
+            "groundOuts": 53,
+            "airOuts": 122,
+            "doubles": 21,
+            "triples": 4,
+            "homeRuns": 12,
+            "strikeOuts": 69,
+            "baseOnBalls": 35,
+            "intentionalWalks": 0,
+            "hits": 90,
+            "hitByPitch": 3,
+            "avg": ".273",
+            "atBats": 330,
+            "obp": ".345",
+            "slg": ".470",
+            "ops": ".815",
+            "groundIntoDoublePlay": 6,
+            "numberOfPitches": 1508,
+            "inningsPitched": "83.0",
+            "outsPitched": 249,
+            "whip": "1.51",
+            "battersFaced": 372,
+            "outs": 249,
+            "gamesPitched": 31,
+            "balls": 569,
+            "strikes": 939,
+            "strikePercentage": ".620",
+            "hitBatsmen": 3,
+            "balks": 0,
+            "wildPitches": 2,
+            "totalBases": 155,
+            "groundOutsToAirouts": "0.43",
+            "rbi": 40,
+            "pitchesPerInning": "18.17",
+            "strikeoutWalkRatio": "1.97",
+            "strikeoutsPer9Inn": "7.48",
+            "walksPer9Inn": "3.80",
+            "hitsPer9Inn": "9.76",
+            "homeRunsPer9": "1.30",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 3
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 664299,
+            "fullName": "Cristian Javier",
+            "link": "/api/v1/people/664299",
+            "firstName": "Cristian",
+            "lastName": "Javier"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 2,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 15,
+            "groundOuts": 36,
+            "airOuts": 37,
+            "doubles": 10,
+            "triples": 1,
+            "homeRuns": 4,
+            "strikeOuts": 24,
+            "baseOnBalls": 17,
+            "intentionalWalks": 0,
+            "hits": 42,
+            "hitByPitch": 0,
+            "avg": ".302",
+            "atBats": 139,
+            "obp": ".378",
+            "slg": ".475",
+            "ops": ".853",
+            "groundIntoDoublePlay": 3,
+            "numberOfPitches": 634,
+            "inningsPitched": "33.0",
+            "outsPitched": 99,
+            "whip": "1.79",
+            "battersFaced": 156,
+            "outs": 99,
+            "gamesPitched": 15,
+            "balls": 272,
+            "strikes": 362,
+            "strikePercentage": ".570",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 1,
+            "totalBases": 66,
+            "groundOutsToAirouts": "0.97",
+            "rbi": 17,
+            "pitchesPerInning": "19.21",
+            "strikeoutWalkRatio": "1.41",
+            "strikeoutsPer9Inn": "6.55",
+            "walksPer9Inn": "4.64",
+            "hitsPer9Inn": "11.45",
+            "homeRunsPer9": "1.09",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 656232,
+            "fullName": "Brandon Bielak",
+            "link": "/api/v1/people/656232",
+            "firstName": "Brandon",
+            "lastName": "Bielak"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 3,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 3,
+            "groundOuts": 2,
+            "airOuts": 6,
+            "doubles": 3,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 7,
+            "baseOnBalls": 1,
+            "intentionalWalks": 0,
+            "hits": 8,
+            "hitByPitch": 1,
+            "avg": ".348",
+            "atBats": 23,
+            "obp": ".400",
+            "slg": ".609",
+            "ops": "1.009",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 104,
+            "inningsPitched": "5.0",
+            "outsPitched": 15,
+            "whip": "1.80",
+            "battersFaced": 25,
+            "outs": 15,
+            "gamesPitched": 3,
+            "balls": 40,
+            "strikes": 64,
+            "strikePercentage": ".620",
+            "hitBatsmen": 1,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 14,
+            "groundOutsToAirouts": "0.33",
+            "rbi": 5,
+            "pitchesPerInning": "20.80",
+            "strikeoutWalkRatio": "7.00",
+            "strikeoutsPer9Inn": "12.60",
+            "walksPer9Inn": "1.80",
+            "hitsPer9Inn": "14.40",
+            "homeRunsPer9": "1.80",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 681869,
+            "fullName": "Shawn Dubin",
+            "link": "/api/v1/people/681869",
+            "firstName": "Shawn",
+            "lastName": "Dubin"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 4,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 63,
+            "groundOuts": 42,
+            "airOuts": 23,
+            "doubles": 3,
+            "triples": 1,
+            "homeRuns": 6,
+            "strikeOuts": 38,
+            "baseOnBalls": 6,
+            "intentionalWalks": 0,
+            "hits": 28,
+            "hitByPitch": 1,
+            "avg": ".217",
+            "atBats": 129,
+            "obp": ".254",
+            "slg": ".395",
+            "ops": ".649",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 523,
+            "inningsPitched": "34.0",
+            "outsPitched": 102,
+            "whip": "1.00",
+            "battersFaced": 138,
+            "outs": 102,
+            "gamesPitched": 63,
+            "balls": 174,
+            "strikes": 349,
+            "strikePercentage": ".670",
+            "hitBatsmen": 1,
+            "balks": 0,
+            "wildPitches": 2,
+            "totalBases": 51,
+            "groundOutsToAirouts": "1.83",
+            "rbi": 19,
+            "pitchesPerInning": "15.38",
+            "strikeoutWalkRatio": "6.33",
+            "strikeoutsPer9Inn": "10.06",
+            "walksPer9Inn": "1.59",
+            "hitsPer9Inn": "7.41",
+            "homeRunsPer9": "1.59",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 2
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 519151,
+            "fullName": "Ryan Pressly",
+            "link": "/api/v1/people/519151",
+            "firstName": "Thomas",
+            "lastName": "Pressly"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 5,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 1,
+            "groundOuts": 0,
+            "airOuts": 0,
+            "doubles": 2,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 0,
+            "baseOnBalls": 0,
+            "intentionalWalks": 0,
+            "hits": 4,
+            "hitByPitch": 1,
+            "avg": "1.000",
+            "atBats": 4,
+            "obp": "1.000",
+            "slg": "1.500",
+            "ops": "2.500",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 13,
+            "inningsPitched": "0.0",
+            "outsPitched": 0,
+            "whip": "-.--",
+            "battersFaced": 5,
+            "outs": 0,
+            "gamesPitched": 1,
+            "balls": 7,
+            "strikes": 6,
+            "strikePercentage": ".460",
+            "hitBatsmen": 1,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 6,
+            "groundOutsToAirouts": "-.--",
+            "rbi": 1,
+            "pitchesPerInning": "-.--",
+            "strikeoutWalkRatio": "-.--",
+            "strikeoutsPer9Inn": "-.--",
+            "walksPer9Inn": "-.--",
+            "hitsPer9Inn": "-.--",
+            "homeRunsPer9": "-.--",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 455117,
+            "fullName": "Martín Maldonado",
+            "link": "/api/v1/people/455117",
+            "firstName": "Martín",
+            "lastName": "Maldonado"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 6,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "2",
+            "name": "Catcher",
+            "type": "Catcher",
+            "abbreviation": "C"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 16,
+            "groundOuts": 21,
+            "airOuts": 31,
+            "doubles": 7,
+            "triples": 0,
+            "homeRuns": 4,
+            "strikeOuts": 21,
+            "baseOnBalls": 11,
+            "intentionalWalks": 0,
+            "hits": 20,
+            "hitByPitch": 2,
+            "avg": ".215",
+            "atBats": 93,
+            "obp": ".311",
+            "slg": ".419",
+            "ops": ".730",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 450,
+            "inningsPitched": "25.0",
+            "outsPitched": 75,
+            "whip": "1.24",
+            "battersFaced": 106,
+            "outs": 75,
+            "gamesPitched": 16,
+            "balls": 166,
+            "strikes": 284,
+            "strikePercentage": ".630",
+            "hitBatsmen": 2,
+            "balks": 1,
+            "wildPitches": 0,
+            "totalBases": 39,
+            "groundOutsToAirouts": "0.68",
+            "rbi": 12,
+            "pitchesPerInning": "18.00",
+            "strikeoutWalkRatio": "1.91",
+            "strikeoutsPer9Inn": "7.56",
+            "walksPer9Inn": "3.96",
+            "hitsPer9Inn": "7.20",
+            "homeRunsPer9": "1.44",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 664353,
+            "fullName": "José Urquidy",
+            "link": "/api/v1/people/664353",
+            "firstName": "José",
+            "lastName": "Urquidy"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 7,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 50,
+            "groundOuts": 14,
+            "airOuts": 35,
+            "doubles": 4,
+            "triples": 0,
+            "homeRuns": 2,
+            "strikeOuts": 20,
+            "baseOnBalls": 10,
+            "intentionalWalks": 0,
+            "hits": 18,
+            "hitByPitch": 0,
+            "avg": ".209",
+            "atBats": 86,
+            "obp": ".289",
+            "slg": ".326",
+            "ops": ".615",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 408,
+            "inningsPitched": "23.1",
+            "outsPitched": 70,
+            "whip": "1.20",
+            "battersFaced": 97,
+            "outs": 70,
+            "gamesPitched": 50,
+            "balls": 157,
+            "strikes": 251,
+            "strikePercentage": ".620",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 1,
+            "totalBases": 28,
+            "groundOutsToAirouts": "0.40",
+            "rbi": 6,
+            "pitchesPerInning": "17.49",
+            "strikeoutWalkRatio": "2.00",
+            "strikeoutsPer9Inn": "7.71",
+            "walksPer9Inn": "3.86",
+            "hitsPer9Inn": "6.94",
+            "homeRunsPer9": "0.77",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 1
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 592773,
+            "fullName": "Ryne Stanek",
+            "link": "/api/v1/people/592773",
+            "firstName": "Ryne",
+            "lastName": "Stanek"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 8,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 11,
+            "groundOuts": 23,
+            "airOuts": 45,
+            "doubles": 4,
+            "triples": 1,
+            "homeRuns": 3,
+            "strikeOuts": 36,
+            "baseOnBalls": 4,
+            "intentionalWalks": 0,
+            "hits": 28,
+            "hitByPitch": 2,
+            "avg": ".214",
+            "atBats": 131,
+            "obp": ".246",
+            "slg": ".328",
+            "ops": ".574",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 519,
+            "inningsPitched": "34.2",
+            "outsPitched": 104,
+            "whip": "0.92",
+            "battersFaced": 138,
+            "outs": 104,
+            "gamesPitched": 11,
+            "balls": 163,
+            "strikes": 356,
+            "strikePercentage": ".690",
+            "hitBatsmen": 2,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 43,
+            "groundOutsToAirouts": "0.51",
+            "rbi": 10,
+            "pitchesPerInning": "14.97",
+            "strikeoutWalkRatio": "9.00",
+            "strikeoutsPer9Inn": "9.35",
+            "walksPer9Inn": "1.04",
+            "hitsPer9Inn": "7.27",
+            "homeRunsPer9": "0.78",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 1
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 434378,
+            "fullName": "Justin Verlander",
+            "link": "/api/v1/people/434378",
+            "firstName": "Justin",
+            "lastName": "Verlander"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 9,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 5,
+            "groundOuts": 4,
+            "airOuts": 2,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 5,
+            "baseOnBalls": 0,
+            "intentionalWalks": 0,
+            "hits": 0,
+            "hitByPitch": 0,
+            "avg": ".000",
+            "atBats": 11,
+            "obp": ".000",
+            "slg": ".000",
+            "ops": ".000",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 45,
+            "inningsPitched": "3.2",
+            "outsPitched": 11,
+            "whip": "0.00",
+            "battersFaced": 11,
+            "outs": 11,
+            "gamesPitched": 5,
+            "balls": 14,
+            "strikes": 31,
+            "strikePercentage": ".690",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 0,
+            "groundOutsToAirouts": "2.00",
+            "rbi": 0,
+            "pitchesPerInning": "12.27",
+            "strikeoutWalkRatio": "-.--",
+            "strikeoutsPer9Inn": "12.27",
+            "walksPer9Inn": "0.00",
+            "hitsPer9Inn": "0.00",
+            "homeRunsPer9": "0.00",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 656986,
+            "fullName": "Bennett Sousa",
+            "link": "/api/v1/people/656986",
+            "firstName": "John",
+            "lastName": "Sousa"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 10,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 20,
+            "groundOuts": 9,
+            "airOuts": 8,
+            "doubles": 2,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 7,
+            "baseOnBalls": 6,
+            "intentionalWalks": 0,
+            "hits": 7,
+            "hitByPitch": 0,
+            "avg": ".233",
+            "atBats": 30,
+            "obp": ".361",
+            "slg": ".300",
+            "ops": ".661",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 145,
+            "inningsPitched": "8.2",
+            "outsPitched": 26,
+            "whip": "1.50",
+            "battersFaced": 37,
+            "outs": 26,
+            "gamesPitched": 20,
+            "balls": 64,
+            "strikes": 81,
+            "strikePercentage": ".560",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 9,
+            "groundOutsToAirouts": "1.13",
+            "rbi": 0,
+            "pitchesPerInning": "16.73",
+            "strikeoutWalkRatio": "1.17",
+            "strikeoutsPer9Inn": "7.27",
+            "walksPer9Inn": "6.23",
+            "hitsPer9Inn": "7.27",
+            "homeRunsPer9": "0.00",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 608665,
+            "fullName": "Kendall Graveman",
+            "link": "/api/v1/people/608665",
+            "firstName": "Kendall",
+            "lastName": "Graveman"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 11,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 1,
+            "groundOuts": 0,
+            "airOuts": 0,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 0,
+            "baseOnBalls": 1,
+            "intentionalWalks": 0,
+            "hits": 1,
+            "hitByPitch": 0,
+            "avg": "1.000",
+            "atBats": 1,
+            "obp": "1.000",
+            "slg": "4.000",
+            "ops": "5.000",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 6,
+            "inningsPitched": "0.0",
+            "outsPitched": 0,
+            "whip": "-.--",
+            "battersFaced": 2,
+            "outs": 0,
+            "gamesPitched": 1,
+            "balls": 5,
+            "strikes": 1,
+            "strikePercentage": ".170",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 4,
+            "groundOutsToAirouts": "-.--",
+            "rbi": 1,
+            "pitchesPerInning": "-.--",
+            "strikeoutWalkRatio": "0.00",
+            "strikeoutsPer9Inn": "-.--",
+            "walksPer9Inn": "-.--",
+            "hitsPer9Inn": "-.--",
+            "homeRunsPer9": "-.--",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 676632,
+            "fullName": "Bligh Madris",
+            "link": "/api/v1/people/676632",
+            "firstName": "Bligh",
+            "lastName": "Madris"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 12,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "3",
+            "name": "First Base",
+            "type": "Infielder",
+            "abbreviation": "1B"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 17,
+            "groundOuts": 17,
+            "airOuts": 30,
+            "doubles": 2,
+            "triples": 0,
+            "homeRuns": 5,
+            "strikeOuts": 21,
+            "baseOnBalls": 16,
+            "intentionalWalks": 0,
+            "hits": 19,
+            "hitByPitch": 1,
+            "avg": ".221",
+            "atBats": 86,
+            "obp": ".346",
+            "slg": ".419",
+            "ops": ".765",
+            "groundIntoDoublePlay": 5,
+            "numberOfPitches": 447,
+            "inningsPitched": "24.1",
+            "outsPitched": 73,
+            "whip": "1.44",
+            "battersFaced": 104,
+            "outs": 73,
+            "gamesPitched": 17,
+            "balls": 177,
+            "strikes": 270,
+            "strikePercentage": ".600",
+            "hitBatsmen": 1,
+            "balks": 0,
+            "wildPitches": 1,
+            "totalBases": 36,
+            "groundOutsToAirouts": "0.57",
+            "rbi": 12,
+            "pitchesPerInning": "18.37",
+            "strikeoutWalkRatio": "1.31",
+            "strikeoutsPer9Inn": "7.77",
+            "walksPer9Inn": "5.92",
+            "hitsPer9Inn": "7.03",
+            "homeRunsPer9": "1.85",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 1
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 669854,
+            "fullName": "Ronel Blanco",
+            "link": "/api/v1/people/669854",
+            "firstName": "Ronel",
+            "lastName": "Blanco"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 13,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 67,
+            "groundOuts": 27,
+            "airOuts": 23,
+            "doubles": 5,
+            "triples": 0,
+            "homeRuns": 3,
+            "strikeOuts": 50,
+            "baseOnBalls": 20,
+            "intentionalWalks": 0,
+            "hits": 22,
+            "hitByPitch": 2,
+            "avg": ".185",
+            "atBats": 119,
+            "obp": ".308",
+            "slg": ".303",
+            "ops": ".611",
+            "groundIntoDoublePlay": 3,
+            "numberOfPitches": 629,
+            "inningsPitched": "35.0",
+            "outsPitched": 105,
+            "whip": "1.20",
+            "battersFaced": 144,
+            "outs": 105,
+            "gamesPitched": 67,
+            "balls": 253,
+            "strikes": 376,
+            "strikePercentage": ".600",
+            "hitBatsmen": 2,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 36,
+            "groundOutsToAirouts": "1.17",
+            "rbi": 11,
+            "pitchesPerInning": "17.97",
+            "strikeoutWalkRatio": "2.50",
+            "strikeoutsPer9Inn": "12.86",
+            "walksPer9Inn": "5.14",
+            "hitsPer9Inn": "5.66",
+            "homeRunsPer9": "0.77",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 2
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 650556,
+            "fullName": "Bryan Abreu",
+            "link": "/api/v1/people/650556",
+            "firstName": "Bryan",
+            "lastName": "Abreu"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 14,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 29,
+            "groundOuts": 39,
+            "airOuts": 14,
+            "doubles": 5,
+            "triples": 1,
+            "homeRuns": 5,
+            "strikeOuts": 45,
+            "baseOnBalls": 14,
+            "intentionalWalks": 0,
+            "hits": 27,
+            "hitByPitch": 2,
+            "avg": ".220",
+            "atBats": 123,
+            "obp": ".309",
+            "slg": ".398",
+            "ops": ".707",
+            "groundIntoDoublePlay": 4,
+            "numberOfPitches": 565,
+            "inningsPitched": "34.2",
+            "outsPitched": 104,
+            "whip": "1.18",
+            "battersFaced": 142,
+            "outs": 104,
+            "gamesPitched": 29,
+            "balls": 216,
+            "strikes": 349,
+            "strikePercentage": ".620",
+            "hitBatsmen": 2,
+            "balks": 0,
+            "wildPitches": 1,
+            "totalBases": 49,
+            "groundOutsToAirouts": "2.79",
+            "rbi": 17,
+            "pitchesPerInning": "16.30",
+            "strikeoutWalkRatio": "3.21",
+            "strikeoutsPer9Inn": "11.68",
+            "walksPer9Inn": "3.63",
+            "hitsPer9Inn": "7.01",
+            "homeRunsPer9": "1.30",
+            "catchersInterference": 1,
+            "sacBunts": 2,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 664285,
+            "fullName": "Framber Valdez",
+            "link": "/api/v1/people/664285",
+            "firstName": "Framber",
+            "lastName": "Valdez"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 15,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 14,
+            "groundOuts": 5,
+            "airOuts": 7,
+            "doubles": 1,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 7,
+            "baseOnBalls": 1,
+            "intentionalWalks": 0,
+            "hits": 5,
+            "hitByPitch": 3,
+            "avg": ".208",
+            "atBats": 24,
+            "obp": ".321",
+            "slg": ".375",
+            "ops": ".696",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 104,
+            "inningsPitched": "6.2",
+            "outsPitched": 20,
+            "whip": "0.90",
+            "battersFaced": 28,
+            "outs": 20,
+            "gamesPitched": 14,
+            "balls": 31,
+            "strikes": 73,
+            "strikePercentage": ".700",
+            "hitBatsmen": 3,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 9,
+            "groundOutsToAirouts": "0.71",
+            "rbi": 2,
+            "pitchesPerInning": "15.60",
+            "strikeoutWalkRatio": "7.00",
+            "strikeoutsPer9Inn": "9.45",
+            "walksPer9Inn": "1.35",
+            "hitsPer9Inn": "6.75",
+            "homeRunsPer9": "1.35",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 656786,
+            "fullName": "Parker Mushinski",
+            "link": "/api/v1/people/656786",
+            "firstName": "Parker",
+            "lastName": "Mushinski"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 16,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 24,
+            "groundOuts": 79,
+            "airOuts": 55,
+            "doubles": 8,
+            "triples": 0,
+            "homeRuns": 7,
+            "strikeOuts": 57,
+            "baseOnBalls": 24,
+            "intentionalWalks": 0,
+            "hits": 62,
+            "hitByPitch": 1,
+            "avg": ".249",
+            "atBats": 249,
+            "obp": ".313",
+            "slg": ".365",
+            "ops": ".678",
+            "groundIntoDoublePlay": 7,
+            "numberOfPitches": 1146,
+            "inningsPitched": "66.0",
+            "outsPitched": 198,
+            "whip": "1.30",
+            "battersFaced": 278,
+            "outs": 198,
+            "gamesPitched": 24,
+            "balls": 435,
+            "strikes": 711,
+            "strikePercentage": ".620",
+            "hitBatsmen": 1,
+            "balks": 0,
+            "wildPitches": 4,
+            "totalBases": 91,
+            "groundOutsToAirouts": "1.44",
+            "rbi": 25,
+            "pitchesPerInning": "17.36",
+            "strikeoutWalkRatio": "2.38",
+            "strikeoutsPer9Inn": "7.77",
+            "walksPer9Inn": "3.27",
+            "hitsPer9Inn": "8.45",
+            "homeRunsPer9": "0.95",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 4
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 641585,
+            "fullName": "J.P. France",
+            "link": "/api/v1/people/641585",
+            "firstName": "Jonathan",
+            "lastName": "France"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 17,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 6,
+            "groundOuts": 5,
+            "airOuts": 14,
+            "doubles": 6,
+            "triples": 1,
+            "homeRuns": 0,
+            "strikeOuts": 12,
+            "baseOnBalls": 4,
+            "intentionalWalks": 0,
+            "hits": 14,
+            "hitByPitch": 0,
+            "avg": ".318",
+            "atBats": 44,
+            "obp": ".375",
+            "slg": ".500",
+            "ops": ".875",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 190,
+            "inningsPitched": "10.2",
+            "outsPitched": 32,
+            "whip": "1.69",
+            "battersFaced": 49,
+            "outs": 32,
+            "gamesPitched": 6,
+            "balls": 64,
+            "strikes": 126,
+            "strikePercentage": ".660",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 22,
+            "groundOutsToAirouts": "0.36",
+            "rbi": 4,
+            "pitchesPerInning": "17.81",
+            "strikeoutWalkRatio": "3.00",
+            "strikeoutsPer9Inn": "10.13",
+            "walksPer9Inn": "3.38",
+            "hitsPer9Inn": "11.81",
+            "homeRunsPer9": "0.00",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 677651,
+            "fullName": "Luis Garcia",
+            "link": "/api/v1/people/677651",
+            "firstName": "Luis",
+            "lastName": "Garcia"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 18,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 67,
+            "groundOuts": 28,
+            "airOuts": 34,
+            "doubles": 7,
+            "triples": 1,
+            "homeRuns": 4,
+            "strikeOuts": 35,
+            "baseOnBalls": 18,
+            "intentionalWalks": 0,
+            "hits": 35,
+            "hitByPitch": 1,
+            "avg": ".267",
+            "atBats": 131,
+            "obp": ".358",
+            "slg": ".427",
+            "ops": ".785",
+            "groundIntoDoublePlay": 3,
+            "numberOfPitches": 665,
+            "inningsPitched": "33.1",
+            "outsPitched": 100,
+            "whip": "1.59",
+            "battersFaced": 151,
+            "outs": 100,
+            "gamesPitched": 67,
+            "balls": 265,
+            "strikes": 400,
+            "strikePercentage": ".600",
+            "hitBatsmen": 1,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 56,
+            "groundOutsToAirouts": "0.82",
+            "rbi": 14,
+            "pitchesPerInning": "19.95",
+            "strikeoutWalkRatio": "1.94",
+            "strikeoutsPer9Inn": "9.45",
+            "walksPer9Inn": "4.86",
+            "hitsPer9Inn": "9.45",
+            "homeRunsPer9": "1.08",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 1
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 606160,
+            "fullName": "Rafael Montero",
+            "link": "/api/v1/people/606160",
+            "firstName": "Rafael",
+            "lastName": "Montero"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 19,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 5,
+            "groundOuts": 3,
+            "airOuts": 1,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 0,
+            "strikeOuts": 5,
+            "baseOnBalls": 2,
+            "intentionalWalks": 0,
+            "hits": 2,
+            "hitByPitch": 0,
+            "avg": ".200",
+            "atBats": 10,
+            "obp": ".333",
+            "slg": ".200",
+            "ops": ".533",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 57,
+            "inningsPitched": "3.1",
+            "outsPitched": 10,
+            "whip": "1.20",
+            "battersFaced": 13,
+            "outs": 10,
+            "gamesPitched": 5,
+            "balls": 24,
+            "strikes": 33,
+            "strikePercentage": ".580",
+            "hitBatsmen": 0,
+            "balks": 1,
+            "wildPitches": 0,
+            "totalBases": 2,
+            "groundOutsToAirouts": "3.00",
+            "rbi": 0,
+            "pitchesPerInning": "17.10",
+            "strikeoutWalkRatio": "2.50",
+            "strikeoutsPer9Inn": "13.50",
+            "walksPer9Inn": "5.40",
+            "hitsPer9Inn": "5.40",
+            "homeRunsPer9": "0.00",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 657424,
+            "fullName": "Matt Gage",
+            "link": "/api/v1/people/657424",
+            "firstName": "Matthew",
+            "lastName": "Gage"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 20,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 62,
+            "groundOuts": 27,
+            "airOuts": 28,
+            "doubles": 8,
+            "triples": 0,
+            "homeRuns": 5,
+            "strikeOuts": 30,
+            "baseOnBalls": 17,
+            "intentionalWalks": 2,
+            "hits": 30,
+            "hitByPitch": 6,
+            "avg": ".265",
+            "atBats": 113,
+            "obp": ".387",
+            "slg": ".469",
+            "ops": ".856",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 534,
+            "inningsPitched": "29.1",
+            "outsPitched": 88,
+            "whip": "1.60",
+            "battersFaced": 138,
+            "outs": 88,
+            "gamesPitched": 62,
+            "balls": 197,
+            "strikes": 337,
+            "strikePercentage": ".630",
+            "hitBatsmen": 6,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 53,
+            "groundOutsToAirouts": "0.96",
+            "rbi": 31,
+            "pitchesPerInning": "18.20",
+            "strikeoutWalkRatio": "1.76",
+            "strikeoutsPer9Inn": "9.20",
+            "walksPer9Inn": "5.22",
+            "hitsPer9Inn": "9.20",
+            "homeRunsPer9": "1.53",
+            "catchersInterference": 0,
+            "sacBunts": 1,
+            "sacFlies": 1
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 664208,
+            "fullName": "Phil Maton",
+            "link": "/api/v1/people/664208",
+            "firstName": "Phillip",
+            "lastName": "Maton"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 21,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 7,
+            "groundOuts": 4,
+            "airOuts": 7,
+            "doubles": 0,
+            "triples": 0,
+            "homeRuns": 1,
+            "strikeOuts": 1,
+            "baseOnBalls": 3,
+            "intentionalWalks": 1,
+            "hits": 5,
+            "hitByPitch": 0,
+            "avg": ".294",
+            "atBats": 17,
+            "obp": ".400",
+            "slg": ".471",
+            "ops": ".871",
+            "groundIntoDoublePlay": 1,
+            "numberOfPitches": 77,
+            "inningsPitched": "4.1",
+            "outsPitched": 13,
+            "whip": "1.85",
+            "battersFaced": 20,
+            "outs": 13,
+            "gamesPitched": 7,
+            "balls": 35,
+            "strikes": 42,
+            "strikePercentage": ".550",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 8,
+            "groundOutsToAirouts": "0.57",
+            "rbi": 1,
+            "pitchesPerInning": "17.77",
+            "strikeoutWalkRatio": "0.33",
+            "strikeoutsPer9Inn": "2.08",
+            "walksPer9Inn": "6.23",
+            "hitsPer9Inn": "10.38",
+            "homeRunsPer9": "2.08",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 669270,
+            "fullName": "Joel Kuhnel",
+            "link": "/api/v1/people/669270",
+            "firstName": "Joel",
+            "lastName": "Kuhnel"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 22,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 29,
+            "groundOuts": 9,
+            "airOuts": 24,
+            "doubles": 2,
+            "triples": 1,
+            "homeRuns": 2,
+            "strikeOuts": 11,
+            "baseOnBalls": 16,
+            "intentionalWalks": 2,
+            "hits": 22,
+            "hitByPitch": 0,
+            "avg": ".333",
+            "atBats": 66,
+            "obp": ".463",
+            "slg": ".485",
+            "ops": ".948",
+            "groundIntoDoublePlay": 0,
+            "numberOfPitches": 336,
+            "inningsPitched": "15.0",
+            "outsPitched": 45,
+            "whip": "2.53",
+            "battersFaced": 82,
+            "outs": 45,
+            "gamesPitched": 29,
+            "balls": 140,
+            "strikes": 196,
+            "strikePercentage": ".580",
+            "hitBatsmen": 0,
+            "balks": 0,
+            "wildPitches": 0,
+            "totalBases": 32,
+            "groundOutsToAirouts": "0.38",
+            "rbi": 12,
+            "pitchesPerInning": "22.40",
+            "strikeoutWalkRatio": "0.69",
+            "strikeoutsPer9Inn": "6.60",
+            "walksPer9Inn": "9.60",
+            "hitsPer9Inn": "13.20",
+            "homeRunsPer9": "1.20",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 0
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 661527,
+            "fullName": "Seth Martinez",
+            "link": "/api/v1/people/661527",
+            "firstName": "Seth",
+            "lastName": "Martinez"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 23,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        },
+        {
+          "season": "2023",
+          "stat": {
+            "gamesPlayed": 31,
+            "groundOuts": 67,
+            "airOuts": 58,
+            "doubles": 17,
+            "triples": 0,
+            "homeRuns": 9,
+            "strikeOuts": 85,
+            "baseOnBalls": 30,
+            "intentionalWalks": 0,
+            "hits": 68,
+            "hitByPitch": 2,
+            "avg": ".246",
+            "atBats": 276,
+            "obp": ".323",
+            "slg": ".406",
+            "ops": ".729",
+            "groundIntoDoublePlay": 7,
+            "numberOfPitches": 1308,
+            "inningsPitched": "72.1",
+            "outsPitched": 217,
+            "whip": "1.35",
+            "battersFaced": 310,
+            "outs": 217,
+            "gamesPitched": 31,
+            "balls": 489,
+            "strikes": 819,
+            "strikePercentage": ".630",
+            "hitBatsmen": 2,
+            "balks": 0,
+            "wildPitches": 2,
+            "totalBases": 112,
+            "groundOutsToAirouts": "1.16",
+            "rbi": 33,
+            "pitchesPerInning": "18.08",
+            "strikeoutWalkRatio": "2.83",
+            "strikeoutsPer9Inn": "10.58",
+            "walksPer9Inn": "3.73",
+            "hitsPer9Inn": "8.46",
+            "homeRunsPer9": "1.12",
+            "catchersInterference": 0,
+            "sacBunts": 0,
+            "sacFlies": 2
+          },
+          "team": {
+            "id": 117,
+            "name": "Houston Astros",
+            "link": "/api/v1/teams/117"
+          },
+          "player": {
+            "id": 686613,
+            "fullName": "Hunter Brown",
+            "link": "/api/v1/people/686613",
+            "firstName": "Hunter",
+            "lastName": "Brown"
+          },
+          "league": {
+            "id": 103,
+            "name": "American League",
+            "link": "/api/v1/league/103"
+          },
+          "sport": {
+            "id": 1,
+            "link": "/api/v1/sports/1",
+            "name": "Major League Baseball"
+          },
+          "rank": 24,
+          "split": {
+            "code": "vl",
+            "description": "vs Left",
+            "sortOrder": 73
+          },
+          "position": {
+            "code": "1",
+            "name": "Pitcher",
+            "type": "Pitcher",
+            "abbreviation": "P"
+          }
+        }
+      ],
+      "splitsTiedWithOffset": [],
+      "splitsTiedWithLimit": [],
+      "playerPool": "ALL"
+    }
+  ]
+}
