@@ -85,6 +85,7 @@ const COMMON_PARAMS: Record<string, string> = {
   chk_stats_launch_angle: 'on', // Average Launch Angle
   chk_stats_hardhit_percent: 'on', // Hard Hit Percentage
   chk_stats_barrels_per_pa_percent: 'on', // Barrels per Plate Appearance Percentage
+  chk_stats_abs: 'on', // At Bats
   minors: 'false', // Exclude minor league games
 };
 
