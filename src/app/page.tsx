@@ -4,12 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-type Matchup = {
-  batter_name: string;
-  pitcher_name: string;
-  avg_xwoba: number;
-};
-
+import { Matchup } from '@/types/player.types'; // Adjust path if needed
 export default function HomePage() {
   const today = new Date().toISOString().slice(0, 10);
   const [selectedDate, setSelectedDate] = useState<string>(today);
@@ -69,8 +64,15 @@ export default function HomePage() {
             <tr className="bg-gray-100">
               <th className="px-4 py-2 text-left">#</th>
               <th className="px-4 py-2 text-left">Batter</th>
+              <th className="px-4 py-2 text-left">Team</th>
+              <th className="px-4 py-2 text-left">Lineup</th>
               <th className="px-4 py-2 text-left">Pitcher</th>
+              <th className="px-4 py-2 text-left">Team</th>
               <th className="px-4 py-2 text-right">Avg xwOBA</th>
+              <th className="px-4 py-2 text-right">LA</th>
+              <th className="px-4 py-2 text-right">Brls/PA</th>
+              <th className="px-4 py-2 text-right">HardHit%</th>
+              <th className="px-4 py-2 text-right">EV</th>
             </tr>
           </thead>
           <tbody>
@@ -81,8 +83,15 @@ export default function HomePage() {
               >
                 <td className="px-4 py-2">{idx + 1}</td>
                 <td className="px-4 py-2">{m.batter_name}</td>
+                <td className="px-4 py-2">{m.batter_team || '-'}</td>
+                <td className="px-4 py-2 text-center">{m.lineup_position || '-'}</td>
                 <td className="px-4 py-2">{m.pitcher_name}</td>
+                <td className="px-4 py-2">{m.pitcher_team || '-'}</td>
                 <td className="px-4 py-2 text-right">{m.avg_xwoba.toFixed(3)}</td>
+                <td className="px-4 py-2 text-right">{m.avg_launch_angle?.toFixed(1) || '-'}</td>
+                <td className="px-4 py-2 text-right">{m.avg_barrels_per_pa?.toFixed(3) || '-'}</td>
+                <td className="px-4 py-2 text-right">{m.avg_hard_hit_pct ? (m.avg_hard_hit_pct * 100).toFixed(1) + '%' : '-'}</td>
+                <td className="px-4 py-2 text-right">{m.avg_exit_velocity?.toFixed(1) || '-'}</td>
               </tr>
             ))}
           </tbody>

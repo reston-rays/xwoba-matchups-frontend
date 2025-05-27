@@ -100,7 +100,7 @@ export default async function handler(
     );
 
     // 4. Fetch boxscores to get batting orders and then gather lookup pairs & player IDs
-    const lookupPairs: Array<{ pit: number; bat: number; batName: string; pitName: string; lineupPosition: number | null }> = [];
+    const lookupPairs: Array<{ pit: number; bat: number; batName: string; pitName: string; lineupPosition: number | null; batterTeam: string | null; pitcherTeam: string | null; }> = [];
     const playerIds = new Set<number>();
     // Store batting orders: Map<gamePk_teamId, playerId[]>
     // Example key: "712345_119" -> [playerId1, playerId2, ...]
@@ -143,38 +143,46 @@ export default async function handler(
 
       const processTeamLineup = (
         teamType: 'home' | 'away',
-        opponentStarter: { id: number; fullName: string }
+        opponentStarter: { id: number; fullName: string },
+        gameData: any // Pass the full game object 'g'
       ) => {
-        const teamData = g.teams[teamType];
+        const teamData = gameData.teams[teamType];
         const teamId = teamData.team.id;
-        const battingOrderPlayerIds = gameTeamBattingOrders.get(`${g.gamePk}_${teamId}`);
-        
-        // Use batting order if available, otherwise fall back to the fetched active roster
-        const playersToProcess = battingOrderPlayerIds
-          ? battingOrderPlayerIds.map(playerId => rosters[teamId]?.find(p => p.person.id === playerId)).filter(p => p) // Find full player object from roster
-          : rosters[teamId];
+        const teamAbbreviation = teamData.team.abbreviation || teamData.team.name || null; // Fallback to name if abbreviation is missing
 
-        playersToProcess?.forEach((p: any, index: number) => {
+        const opponentTeamAbbreviation = teamType === 'home' ? (gameData.teams.away.team.abbreviation || gameData.teams.away.team.name) : (gameData.teams.home.team.abbreviation || gameData.teams.home.team.name);
+        
+        const battingOrderPlayerIds = gameTeamBattingOrders.get(`${gameData.gamePk}_${teamId}`);
+        const fullRoster = rosters[teamId];
+
+        // Always process the full active roster
+        fullRoster?.forEach((p: any) => {
           if (!p || !p.person || !p.person.id) return; // Skip if player data is incomplete
 
-          playerIds.add(p.person.id);
+          const playerId = p.person.id;
+        
+          playerIds.add(playerId);
           playerIds.add(opponentStarter.id);
           
           // Lineup position is 1-indexed if from battingOrder, null otherwise
-          const lineupPosition = battingOrderPlayerIds ? index + 1 : null;
+          // Find the lineup position if the player is in the batting order
+          const lineupIndex = battingOrderPlayerIds ? battingOrderPlayerIds.indexOf(playerId) : -1;
+          const lineupPosition = lineupIndex !== -1 ? lineupIndex + 1 : null;
 
           lookupPairs.push({
-            bat: p.person.id,
+            bat: playerId,
             pit: opponentStarter.id,
             batName: p.person.fullName,
             pitName: opponentStarter.fullName,
             lineupPosition: lineupPosition,
+            batterTeam: teamAbbreviation,
+            pitcherTeam: opponentTeamAbbreviation,
           });
         });
       };
 
-      processTeamLineup('home', awayStarter);
-      processTeamLineup('away', homeStarter);
+      processTeamLineup('home', awayStarter, g);
+      processTeamLineup('away', homeStarter, g);
 
       log(`🔍 Processed game ${g.gamePk}: ${lookupPairs.length} matchups found`);
     }
@@ -209,7 +217,7 @@ export default async function handler(
     }
 
     // 7. Build upserts
-    const upserts = lookupPairs.reduce<any[]>((acc, { pit, bat, batName, pitName, lineupPosition }) => {
+    const upserts = lookupPairs.reduce<any[]>((acc, { pit, bat, batName, pitName, lineupPosition, batterTeam, pitcherTeam }) => {
       const batSide = batMap.get(bat);
       const pitSide = pitMap.get(pit);
       if (!batSide || !pitSide) return acc;
@@ -235,6 +243,8 @@ export default async function handler(
           pitcher_id: pit,
           batter_name: batName,
           pitcher_name: pitName,
+          batter_team: batterTeam,
+          pitcher_team: pitcherTeam,
           lineup_position: lineupPosition,
           // Calculate averages for all required stats
           avg_xwoba: (pitcherSplitData.xwoba + batterSplitData.xwoba) / 2,

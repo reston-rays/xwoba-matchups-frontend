@@ -28,3 +28,16 @@ export interface PlayerSplit {
   flyball_pct: number | null;
   last_updated?: string;
 }
+
+export interface Matchup  {
+  batter_name: string;
+  lineup_position: number | null; // Optional field for lineup position
+  pitcher_name: string;
+  batter_team: string; // Optional field for batter's team
+  pitcher_team: string; // Optional field for pitcher's team
+  avg_xwoba: number;
+  avg_launch_angle: number | null;
+  avg_barrels_per_pa: number | null;
+  avg_hard_hit_pct: number | null;
+  avg_exit_velocity: number | null;
+}

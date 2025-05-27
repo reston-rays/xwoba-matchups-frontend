@@ -3,15 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseServer } from '@/lib/supabaseServerClient';
 
-type Matchup = {
-  batter_name: string;
-  pitcher_name: string;
-  avg_xwoba: number;
-  avg_launch_angle: number;
-  avg_barrels_per_pa: number;
-  avg_hard_hit_pct: number;
-  avg_exit_velocity: number;
-};
+import { Matchup } from '@/types/player.types'; // Adjust path if needed
 
 type ErrorResponse = { error: string };
 
@@ -28,10 +20,9 @@ export default async function handler(
     // 2. Query Supabase (no generic on select)
     const { data, error } = await supabaseServer
       .from('daily_matchups')
-      .select('batter_name, pitcher_name, avg_xwoba')
+      .select('batter_name, pitcher_name, batter_team, pitcher_team, avg_xwoba, avg_launch_angle, avg_barrels_per_pa, avg_hard_hit_pct, avg_exit_velocity, lineup_position')
       .eq('game_date', gameDate)
-      .order('avg_xwoba', { ascending: false })
-      .limit(20);
+      .order('avg_xwoba', { ascending: false });
 
     if (error) {
       console.error('Error querying matchups:', error);
