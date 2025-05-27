@@ -99,12 +99,36 @@ export default async function handler(
       })
     );
 
+    // 3.5 Fetch team details for abbreviations
+    const teamAbbrMap = new Map<number, string>();
+    if (teamIds.length > 0) {
+      log(`ℹ️ Fetching team details for ${teamIds.length} teams to get abbreviations...`);
+      await Promise.all(
+        teamIds.map(async (tid: number) => {
+          try {
+            const teamDetails: any = await fetchWithRetry(`https://statsapi.mlb.com/api/v1/teams/${tid}`);
+            if (teamDetails?.teams?.[0]?.abbreviation) {
+              teamAbbrMap.set(tid, teamDetails.teams[0].abbreviation);
+              log(`🏷️ Team Abbr [${tid}]: ${teamDetails.teams[0].abbreviation}`);
+            }
+          } catch (err) {
+            log(`⚠️ Error fetching team details for ID ${tid}: ${err instanceof Error ? err.message : String(err)}`);
+          }
+        })
+      );
+    }
+
     // 4. Fetch boxscores to get batting orders and then gather lookup pairs & player IDs
-    const lookupPairs: Array<{ pit: number; bat: number; batName: string; pitName: string; lineupPosition: number | null; batterTeam: string | null; pitcherTeam: string | null; }> = [];
+    const lookupPairs: Array<{ gamePk: string | number; homeTeamAbbr: string | null; awayTeamAbbr: string | null; pit: number; bat: number; batName: string; pitName: string; lineupPosition: number | null; batterTeam: string | null; pitcherTeam: string | null; }> = [];
     const playerIds = new Set<number>();
     // Store batting orders: Map<gamePk_teamId, playerId[]>
     // Example key: "712345_119" -> [playerId1, playerId2, ...]
     const gameTeamBattingOrders = new Map<string, number[]>();
+
+    // Helper to get abbreviation or fallback to name
+    const getTeamIdentifier = (teamId: number, fallbackName?: string | null): string | null => {
+      return teamAbbrMap.get(teamId) || fallbackName || null;
+    };
 
     for (const g of games) {
       const homeStarter = await getStarter(g, 'home');
@@ -113,6 +137,11 @@ export default async function handler(
         log(`⏭️ Skipping game ${g.gamePk}`);
         continue;
       }
+
+      const gameHomeTeamId = g.teams.home.team.id;
+      const gameAwayTeamId = g.teams.away.team.id;
+      const actualGameHomeAbbr = getTeamIdentifier(gameHomeTeamId, g.teams.home.team.name);
+      const actualGameAwayAbbr = getTeamIdentifier(gameAwayTeamId, g.teams.away.team.name);
 
       // Fetch boxscore for batting orders
       try {
@@ -148,9 +177,11 @@ export default async function handler(
       ) => {
         const teamData = gameData.teams[teamType];
         const teamId = teamData.team.id;
-        const teamAbbreviation = teamData.team.abbreviation || teamData.team.name || null; // Fallback to name if abbreviation is missing
-
-        const opponentTeamAbbreviation = teamType === 'home' ? (gameData.teams.away.team.abbreviation || gameData.teams.away.team.name) : (gameData.teams.home.team.abbreviation || gameData.teams.home.team.name);
+        const batterTeamIdentifier = getTeamIdentifier(teamId, teamData.team.name);
+        
+        const gamePk = gameData.gamePk;
+        const opponentTeamId = (teamType === 'home' ? gameData.teams.away.team.id : gameData.teams.home.team.id);
+        const pitcherTeamIdentifier = getTeamIdentifier(opponentTeamId, (teamType === 'home' ? gameData.teams.away.team.name : gameData.teams.home.team.name));
         
         const battingOrderPlayerIds = gameTeamBattingOrders.get(`${gameData.gamePk}_${teamId}`);
         const fullRoster = rosters[teamId];
@@ -170,13 +201,16 @@ export default async function handler(
           const lineupPosition = lineupIndex !== -1 ? lineupIndex + 1 : null;
 
           lookupPairs.push({
+            gamePk,
+            homeTeamAbbr: actualGameHomeAbbr,
+            awayTeamAbbr: actualGameAwayAbbr,
             bat: playerId,
             pit: opponentStarter.id,
             batName: p.person.fullName,
             pitName: opponentStarter.fullName,
             lineupPosition: lineupPosition,
-            batterTeam: teamAbbreviation,
-            pitcherTeam: opponentTeamAbbreviation,
+            batterTeam: batterTeamIdentifier,
+            pitcherTeam: pitcherTeamIdentifier,
           });
         });
       };
@@ -192,12 +226,36 @@ export default async function handler(
     log(`🆔 Unique player IDs: ${uniquePlayerIds.length}`);
 
     // 5. Batch-fetch splits
-    const { data: allSplits }: any = await supabaseServer
-      .from('player_splits')
-      .select('player_id, season, player_type,vs_handedness,xwoba,avg_launch_angle,barrels_per_pa,hard_hit_pct,avg_exit_velocity')
-      .eq('season', 0) // Fetch only weighted average data (season 0)
-      .in('player_id', uniquePlayerIds);
-    log(`📊 Splits fetched: ${allSplits?.length ?? 0}`);
+    let allSplits: any[] = [];
+    const BATCH_SIZE_PLAYER_IDS = 300; // Number of player IDs per Supabase query batch
+
+    if (uniquePlayerIds.length > 0) {
+      log(`ℹ️ Batch fetching player_splits for ${uniquePlayerIds.length} players in batches of ${BATCH_SIZE_PLAYER_IDS}...`);
+      for (let i = 0; i < uniquePlayerIds.length; i += BATCH_SIZE_PLAYER_IDS) {
+        const playerIdsBatch = uniquePlayerIds.slice(i, i + BATCH_SIZE_PLAYER_IDS);
+        log(`🔄 Fetching splits for player ID batch ${Math.floor(i / BATCH_SIZE_PLAYER_IDS) + 1} (IDs: ${playerIdsBatch.length})`);
+        
+        const { data: batchData, error: batchError } = await supabaseServer
+          .from('player_splits')
+          .select('player_id, season, player_type,vs_handedness,xwoba,avg_launch_angle,barrels_per_pa,hard_hit_pct,avg_exit_velocity')
+          .eq('season', 0)
+          .in('player_id', playerIdsBatch)
+          .limit(playerIdsBatch.length * 3); // Ample limit for this batch (e.g., *3 for safety, assuming max 2-3 splits per player for season 0)
+
+        if (batchError) {
+          log(`❌ Error fetching player_splits batch: ${batchError.message}`);
+          // Decide if you want to throw or continue with partial data
+          // For now, we'll log and continue, potentially leading to skipped matchups later
+        } else if (batchData) {
+          allSplits = allSplits.concat(batchData);
+          log(`👍 Fetched ${batchData.length} splits in this batch. Total splits so far: ${allSplits.length}`);
+        }
+      }
+      log(`📊 Total splits fetched after batching: ${allSplits.length}`);
+    } else {
+      log('⚠️ No unique player IDs found, skipping player_splits fetch.');
+    }
+    
 
     // 6. Batch-fetch handedness
     const batMap = new Map<number, string>();
@@ -217,10 +275,17 @@ export default async function handler(
     }
 
     // 7. Build upserts
-    const upserts = lookupPairs.reduce<any[]>((acc, { pit, bat, batName, pitName, lineupPosition, batterTeam, pitcherTeam }) => {
+    const upserts = lookupPairs.reduce<any[]>((acc, { gamePk, homeTeamAbbr, awayTeamAbbr, pit, bat, batName, pitName, lineupPosition, batterTeam, pitcherTeam }) => {
       const batSide = batMap.get(bat);
       const pitSide = pitMap.get(pit);
-      if (!batSide || !pitSide) return acc;
+
+      if (!batSide || !pitSide) {
+        let missingHandednessReason = "";
+        if (!batSide) missingHandednessReason += `Batter (ID:${bat}, Name:${batName}) batSide not found. `;
+        if (!pitSide) missingHandednessReason += `Pitcher (ID:${pit}, Name:${pitName}) pitchHand not found. `;
+        log(`⚠️ Skipping matchup Bat:${bat}(${batName}) vs Pit:${pit}(${pitName}) due to missing handedness: ${missingHandednessReason}`);
+        return acc;
+      }
 
       const pitcherSplitData = allSplits?.find((s: any) =>
         s.player_type === 'pitcher' && s.player_id === pit && s.vs_handedness === batSide
@@ -228,6 +293,8 @@ export default async function handler(
       const batterSplitData = allSplits?.find((s: any) =>
         s.player_type === 'batter' && s.player_id === bat && s.vs_handedness === pitSide
       );
+
+      let detailedSkipReason = "";
 
       if (
         pitcherSplitData && batterSplitData &&
@@ -237,8 +304,12 @@ export default async function handler(
         pitcherSplitData.hard_hit_pct != null && batterSplitData.hard_hit_pct != null &&
         pitcherSplitData.avg_exit_velocity != null && batterSplitData.avg_exit_velocity != null
       ) {
+        // All conditions met, add to upserts
         acc.push({
           game_date: gameDate,
+          game_pk: gamePk,
+          game_home_team_abbreviation: homeTeamAbbr,
+          game_away_team_abbreviation: awayTeamAbbr,
           batter_id: bat,
           pitcher_id: pit,
           batter_name: batName,
@@ -254,9 +325,22 @@ export default async function handler(
           avg_exit_velocity: (pitcherSplitData.avg_exit_velocity + batterSplitData.avg_exit_velocity) / 2,
         });
       } else {
-        // Log if a matchup is skipped due to missing data, which would violate NOT NULL constraints
-        // This helps in debugging data issues in player_splits
-        log(`⚠️ Skipping matchup Bat:${bat}(${batName}) vs Pit:${pit}(${pitName}) due to missing one or more required player_split stats.`);
+        // Determine the exact reason for skipping
+        if (!pitcherSplitData) {
+          detailedSkipReason += `Pitcher split data not found (for PitID:${pit} vs ${batSide}). `;
+        } else {
+          if (pitcherSplitData.xwoba == null) detailedSkipReason += `Pitcher xwoba is null. `;
+          if (pitcherSplitData.avg_launch_angle == null) detailedSkipReason += `Pitcher LA is null. `;
+          // Add more checks for other pitcher stats if needed for debugging
+        }
+        if (!batterSplitData) {
+          detailedSkipReason += `Batter split data not found (for BatID:${bat} vs ${pitSide}). `;
+        } else {
+          if (batterSplitData.xwoba == null) detailedSkipReason += `Batter xwoba is null. `;
+          if (batterSplitData.avg_launch_angle == null) detailedSkipReason += `Batter LA is null. `;
+          // Add more checks for other batter stats if needed for debugging
+        }
+        log(`⚠️ Skipping matchup Bat:${bat}(${batName}) vs Pit:${pit}(${pitName}). Reason(s): ${detailedSkipReason || "One or more required player_split stats are null or records not found."}`);
       }
       return acc;
     }, []);
