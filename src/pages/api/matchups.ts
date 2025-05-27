@@ -7,6 +7,10 @@ type Matchup = {
   batter_name: string;
   pitcher_name: string;
   avg_xwoba: number;
+  avg_launch_angle: number;
+  avg_barrels_per_pa: number;
+  avg_hard_hit_pct: number;
+  avg_exit_velocity: number;
 };
 
 type ErrorResponse = { error: string };

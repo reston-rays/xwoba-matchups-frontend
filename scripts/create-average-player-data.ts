@@ -184,9 +184,9 @@ async function main() {
   while (true) {
     const { data: pageData, error: pageError, count } = await supabase
       .from('player_splits')
-      .select('player_id, season, player_type, vs_handedness, player_name, pa, woba, xwoba, hard_hit_pct, avg_launch_angle, avg_exit_velocity, barrels_per_pa', { count: 'exact' })
+      .select('*', { count: 'exact' })
       .in('season', SEASONS_TO_CONSIDER)
-      .range(page * pageSize, (page + 1) * pageSize - 1);
+      .range(page * pageSize, (page + 1) * pageSize - 1) as { data: PlayerSplit[] | null, error: any, count: number | null };
 
     if (pageError) {
       fetchError = pageError;
