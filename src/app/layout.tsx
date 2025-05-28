@@ -25,11 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-900 text-slate-200`}
       >
         {/* Global Header */}
-        <header className="p-4 border-b bg-slate-50">
-          <h1 className="text-2xl font-bold">xwOBA Matchups</h1>
+        <header className="p-4 border-b border-slate-700 bg-slate-800">
+          <h1 className="text-2xl font-bold text-slate-100">xwOBA Matchups</h1>
         </header>
 
         {/* Main Content */}

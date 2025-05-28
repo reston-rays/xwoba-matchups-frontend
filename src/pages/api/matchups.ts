@@ -109,9 +109,6 @@ export default async function handler(
             // if (game.game_pk === 777753) { // Example: focus on a known game_pk
             //   log(`  [Game ${game.game_pk}] DETAILED NO MATCH: Number(matchup.game_pk)='${Number(matchup.game_pk)}' (original matchup.game_pk='${matchup.game_pk}', type: ${typeof matchup.game_pk}) vs game.game_pk='${game.game_pk}' (type: ${typeof game.game_pk})`);
             // }
-            if (game.game_pk === 777753) { // Focus on a specific game_pk you're investigating
-              console.log(`  [Game 777753 Check] Matchup PK: ${matchup.game_pk} (type: ${typeof matchup.game_pk}), Game PK: ${game.game_pk} (type: ${typeof game.game_pk}), IsMatch: ${isMatch}`);
-            }
           }
           return isMatch;
         }

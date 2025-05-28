@@ -177,7 +177,7 @@ export default function HomePage() {
     try {
       return new Date(utcDateTime).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     } catch (err: any) {
-      setError(err.message ?? 'Unknown error');
+      // setError(_err.message ?? 'Unknown error'); // Avoid setting error from a simple formatter
       return 'Invalid Date';
     }
   };
@@ -193,7 +193,7 @@ export default function HomePage() {
           type="date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}
-          className="border px-2 py-1 rounded"
+          className="border border-slate-600 bg-slate-700 px-2 py-1 rounded text-slate-100"
           id="date-selector"
         />
       </label>
@@ -208,7 +208,7 @@ export default function HomePage() {
             onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
               setDisplayLimit(Number(event.target.value));
             }}
-            className="border px-2 py-1 rounded text-sm"
+            className="border border-slate-600 bg-slate-700 px-2 py-1 rounded text-sm text-slate-100"
           >
             <option value={10}>Top 10</option>
             <option value={20}>Top 20</option>
@@ -224,7 +224,7 @@ export default function HomePage() {
 
       {/* Error state */}
       {error && (
-        <div className="text-red-600 mb-4">
+        <div className="text-red-400 mb-4">
           Error loading {selectedDate} matchups: {error}
         </div>
       )}
@@ -232,7 +232,7 @@ export default function HomePage() {
       {/* Loading state */}
       {allGamesWithMatchups === null && !error ? ( // Check allGamesWithMatchups for initial load
         <div>Loading…</div>
-      ) : allGamesWithMatchups && allGamesWithMatchups.length === 0 && !error ? (
+      ) : allGamesWithMatchups && allGamesWithMatchups.length === 0 && !error ? ( // Added check for allGamesWithMatchups being defined
         <div>No matchups found for {selectedDate}.</div>
       ) : (
         <>
@@ -241,17 +241,17 @@ export default function HomePage() {
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Matchups by Game</h2>
               {gamesData.map((game) => (
-                <div key={game.gamePk} className="mb-8 p-4 border rounded-md shadow-sm">
+                <div key={game.gamePk} className="mb-8 p-4 border border-slate-700 bg-slate-800 rounded-md shadow-sm">
                   <div className="text-center mb-3">
                     <h3 className="text-lg font-semibold">
                       {game.awayTeamAbbr || 'Away Team'} @ {game.homeTeamAbbr || 'Home Team'}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-400">
                       {formatGameTime(game.gameTime)}
                       {game.detailedState && ` - ${game.detailedState}`}
                     </p>
                     {game.venue && (
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-slate-500 mt-1">
                         <p>{game.venue.name}</p>
                         <p>
                           {game.venue.roof_type && `Roof: ${game.venue.roof_type}`}
@@ -306,14 +306,13 @@ type MatchupTableProps = {
 
 function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTableProps) {
   const getXwobaColorClass = (xwoba: number): string => {
-    if (xwoba >= 0.360) {
-      return 'text-blue-600 font-semibold'; // High value - Blue
-    } else if (xwoba >= 0.320) {
-      return 'text-green-600 font-semibold'; // Mid value - Green
+    if (xwoba >= 0.350) { // Adjusted threshold slightly for example
+      return 'text-green-400 font-semibold'; // High value - Lighter Blue for dark bg
+    } else if (xwoba >= 0.300) { // Adjusted threshold slightly for example
+      return 'text-yellow-300 font-semibold'; // Mid value - Lighter Green
     } else {
-      return 'text-orange-600 font-semibold'; // Low value - Orange
+      return 'text-orange-300 font-semibold'; // Low value - Lighter Orange
     }
-    // Consider adding a default class or handling for unexpected values if necessary
   };
 
   const hardHitThresholds = React.useMemo(() => {
@@ -343,11 +342,11 @@ function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTa
     }
 
     if (hardHitPctValue >= hardHitThresholds.threshold2) {
-      return 'text-indigo-600 font-semibold'; // High value - Indigo
+      return 'text-indigo-400 font-semibold'; // High value - Lighter Indigo
     } else if (hardHitPctValue >= hardHitThresholds.threshold1) {
-      return 'text-sky-600 font-semibold';    // Mid value - Sky Blue
+      return 'text-sky-400 font-semibold';    // Mid value - Lighter Sky Blue
     } else {
-      return 'text-teal-600 font-semibold';   // Low value - Teal
+      return 'text-teal-400 font-semibold';   // Low value - Lighter Teal
     }
   };
 
@@ -355,7 +354,7 @@ function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTa
     return (
       <div className="py-4">
         {title && <h4 className="text-md font-semibold mb-2">{title}</h4>}
-        <p className="text-sm text-gray-600">No matchups to display.</p>
+        <p className="text-sm text-slate-400">No matchups to display.</p>
       </div>
     );
   }
@@ -366,7 +365,7 @@ function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTa
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse text-sm">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-slate-700">
                 {!isGameSpecificView && <th className="px-3 py-2 text-left">#</th>}
                 <th className="px-3 py-2 text-left">Batter</th>
                 {!isGameSpecificView && <th className="px-3 py-2 text-left hidden sm:table-cell">Team</th>}
@@ -382,7 +381,7 @@ function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTa
             </thead>
             <tbody>
               {matchups.map((m, idx) => (
-                <tr key={`${m.game_pk}-${m.batter_id}-${m.pitcher_id}`} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <tr key={`${m.game_pk}-${m.batter_id}-${m.pitcher_id}`} className={idx % 2 === 0 ? 'bg-slate-800' : 'bg-slate-700'}>
                   {!isGameSpecificView && <td className="px-3 py-2">{idx + 1}</td>}
                   <td className="px-3 py-2">{m.batter_name} ({m.batter_hand})</td>
                   {!isGameSpecificView && <td className="px-3 py-2 hidden sm:table-cell">{m.batter_team || '-'}</td>}
