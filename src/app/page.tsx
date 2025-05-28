@@ -176,8 +176,7 @@ export default function HomePage() {
     if (!utcDateTime) return 'TBD';
     try {
       return new Date(utcDateTime).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    } catch (err: any) {
-      // setError(_err.message ?? 'Unknown error'); // Avoid setting error from a simple formatter
+    } catch {
       return 'Invalid Date';
     }
   };
