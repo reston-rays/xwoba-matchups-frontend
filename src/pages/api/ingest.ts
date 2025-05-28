@@ -227,7 +227,7 @@ export default async function handler(
 
     // 5. Batch-fetch splits
     let allSplits: any[] = [];
-    const BATCH_SIZE_PLAYER_IDS = 300; // Number of player IDs per Supabase query batch
+    const BATCH_SIZE_PLAYER_IDS = 100; // Number of player IDs per Supabase query batch
 
     if (uniquePlayerIds.length > 0) {
       log(`ℹ️ Batch fetching player_splits for ${uniquePlayerIds.length} players in batches of ${BATCH_SIZE_PLAYER_IDS}...`);
@@ -239,8 +239,8 @@ export default async function handler(
           .from('player_splits')
           .select('player_id, season, player_type,vs_handedness,xwoba,avg_launch_angle,barrels_per_pa,hard_hit_pct,avg_exit_velocity')
           .eq('season', 0)
-          .in('player_id', playerIdsBatch)
-          .limit(playerIdsBatch.length * 3); // Ample limit for this batch (e.g., *3 for safety, assuming max 2-3 splits per player for season 0)
+          .in('player_id', playerIdsBatch) // Fetch all season 0 splits for players in the batch
+          .limit(playerIdsBatch.length * 6); // Increased limit: assuming max ~6 relevant splits (e.g., B/P vs L/R/S) per player for season 0
 
         if (batchError) {
           log(`❌ Error fetching player_splits batch: ${batchError.message}`);
@@ -287,13 +287,34 @@ export default async function handler(
         return acc;
       }
 
+      // Determine the actual handedness the pitcher is facing.
+      // This is important if the batter is a switch hitter.
+      let handednessPitcherFaces = batSide; // Default to batter's listed side
+      if (batSide === 'S') {
+        if (pitSide === 'R') {
+          handednessPitcherFaces = 'L'; // Switch hitter bats Left against RHP
+        } else if (pitSide === 'L') {
+          handednessPitcherFaces = 'R'; // Switch hitter bats Right against LHP
+        } else {
+          // This case implies pitSide is defined but not 'R' or 'L' (e.g., 'S' itself, or bad data from API).
+          // This is highly unlikely for a pitcher's throwing hand.
+          log(`⚠️ Cannot determine effective batter hand for pitcher splits: Batter ${batName}(ID:${bat}) is Switch, but Pitcher ${pitName}(ID:${pit}) has unexpected pitSide '${pitSide}'. Skipping matchup.`);
+          return acc;
+        }
+      }
+      // If batSide was 'R' or 'L', handednessPitcherFaces remains as batSide.
+
       const pitcherSplitData = allSplits?.find((s: any) =>
-        s.player_type === 'pitcher' && s.player_id === pit && s.vs_handedness === batSide
+        s.player_type === 'pitcher' && s.player_id === pit && s.vs_handedness === handednessPitcherFaces
       );
+
+      // Batter split data lookup remains the same: it's how the batter performs against the pitcher's actual throwing hand.
+      // The player_splits table for a batter should have vs_handedness = 'R' (meaning vs RHP)
+      // and vs_handedness = 'L' (meaning vs LHP). For a switch hitter, these entries already
+      // reflect them batting from the optimal side against that type of pitcher.
       const batterSplitData = allSplits?.find((s: any) =>
         s.player_type === 'batter' && s.player_id === bat && s.vs_handedness === pitSide
       );
-
       let detailedSkipReason = "";
 
       if (
@@ -317,6 +338,8 @@ export default async function handler(
           batter_team: batterTeam,
           pitcher_team: pitcherTeam,
           lineup_position: lineupPosition,
+          pitcher_hand: pitSide as 'L' | 'R', // Add pitcher hand
+          batter_hand: batSide as 'L' | 'R' | 'S', // Add batter hand
           // Calculate averages for all required stats
           avg_xwoba: (pitcherSplitData.xwoba + batterSplitData.xwoba) / 2,
           avg_launch_angle: (pitcherSplitData.avg_launch_angle + batterSplitData.avg_launch_angle) / 2,
@@ -327,7 +350,7 @@ export default async function handler(
       } else {
         // Determine the exact reason for skipping
         if (!pitcherSplitData) {
-          detailedSkipReason += `Pitcher split data not found (for PitID:${pit} vs ${batSide}). `;
+          detailedSkipReason += `Pitcher split data not found (for PitID:${pit} vs ${handednessPitcherFaces}). `;
         } else {
           if (pitcherSplitData.xwoba == null) detailedSkipReason += `Pitcher xwoba is null. `;
           if (pitcherSplitData.avg_launch_angle == null) detailedSkipReason += `Pitcher LA is null. `;

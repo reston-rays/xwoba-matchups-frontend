@@ -45,4 +45,6 @@ export interface Matchup  {
   pitcher_id: number; // MLBAM ID for pitcher
   game_home_team_abbreviation: string | null; // Optional, for home team
   game_away_team_abbreviation: string | null; // Optional, for away team
+  pitcher_hand: 'L' | 'R'; // Pitcher's throwing hand
+  batter_hand: 'L' | 'R' | 'S'; // Batter's batting hand
 }
