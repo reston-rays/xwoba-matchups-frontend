@@ -19,7 +19,7 @@ export default async function handler(
   res: NextApiResponse<GamesWithMatchupsAndVenues[] | ErrorResponse>
 ) {
   try {
-    const requestLogs: string[] = [];
+    // const requestLogs: string[] = [];
     const log = (message: string) => {
       // Log to server console
       console.log(`[API /api/matchups] ${message}`);
