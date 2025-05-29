@@ -62,6 +62,9 @@ export interface Game {
   away_batting_order: number[] | null; // Array of player_ids representing the away team batting order, from liveData.boxscore.teams.away.battingOrder.
   home_batting_order: number[] | null; // Array of player_ids representing the home team batting order, from liveData.boxscore.teams.home.battingOrder.
 
+  away_team_probable_pitcher_id?: number | null; // Nullable BIGINT. ID of the away team's probable pitcher, if available.
+  home_team_probable_pitcher_id?: number | null; // Nullable BIGINT. ID of the home team's probable pitcher, if available
+
   last_updated: string; // TIMESTAMPTZ. Timestamp of the last update.
 
   // Optional fields that might be populated from games[0].teams.away/home if needed,

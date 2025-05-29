@@ -36,7 +36,8 @@ export default async function handler(
   try {
     log('🚀 Starting add-games script...');
 
-    const allGamesToUpsert: Omit<Game, 'last_updated'>[] = []; // Use Omit for DB interaction
+    // Use a Map to store games, ensuring uniqueness by game_pk
+    const gamesMap = new Map<number, Omit<Game, 'last_updated'>>();
     const today = new Date();
 
     for (let i = 0; i < 8; i++) { // Today + next 7 days
@@ -46,7 +47,7 @@ export default async function handler(
 
       log(`🗓️ Fetching schedule for date: ${dateString}`);
 
-      const scheduleApiUrl = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&hydrate=lineups&date=${dateString}`;
+      const scheduleApiUrl = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&hydrate=lineups,probablePitcher(All)&date=${dateString}`;
       const scheduleData: any = await fetchWithRetry(scheduleApiUrl);
 
       const gamesForDate: any[] = scheduleData.dates?.[0]?.games || [];
@@ -56,6 +57,11 @@ export default async function handler(
         continue;
       }
       log(`🏟️ Found ${gamesForDate.length} games for ${dateString}`);
+
+      // Log game_pks for the current date
+      const gamePksForDate = gamesForDate.map((g: any) => g.gamePk).filter(Boolean);
+      log(`🔢 Game PKs for ${dateString}: [${gamePksForDate.join(', ')}]`);
+
 
       gamesForDate.forEach((apiGame: any) => {
         if (!apiGame.gamePk || !apiGame.teams?.away?.team?.id || !apiGame.teams?.home?.team?.id || !apiGame.venue?.id) {
@@ -82,28 +88,34 @@ export default async function handler(
           venue_id: apiGame.venue.id,
           away_batting_order: awayBattingOrder || null,
           home_batting_order: homeBattingOrder || null,
+          home_team_probable_pitcher_id: apiGame.teams.home.probablePitcher?.id || null,
+          away_team_probable_pitcher_id: apiGame.teams.away.probablePitcher?.id || null
         };
-        allGamesToUpsert.push(gameRecord);
+        // If a game with the same game_pk is encountered again, it will overwrite the previous one in the Map.
+        // This ensures we only have the latest version if duplicates exist across date fetches.
+        gamesMap.set(gameRecord.game_pk, gameRecord);
       });
     }
 
-    if (allGamesToUpsert.length > 0) {
-      log(`💾 Preparing to upsert ${allGamesToUpsert.length} game records into 'games' table...`);
+    const uniqueGamesToUpsert = Array.from(gamesMap.values());
+
+    if (uniqueGamesToUpsert.length > 0) {
+      log(`💾 Preparing to upsert ${uniqueGamesToUpsert.length} unique game records into 'games' table...`);
       const { error: upsertError } = await supabaseServer
         .from('games')
-        .upsert(allGamesToUpsert, { onConflict: 'game_pk' }); // Assumes game_pk is your primary or unique key for conflicts
+        .upsert(uniqueGamesToUpsert, { onConflict: 'game_pk' });
 
       if (upsertError) {
         log(`❌ Error upserting games: ${upsertError.message}`);
         console.error('Upsert error details:', upsertError);
         throw upsertError;
       }
-      log(`✅ Successfully upserted/updated ${allGamesToUpsert.length} game records.`);
+      log(`✅ Successfully upserted/updated ${uniqueGamesToUpsert.length} game records.`);
     } else {
       log('🤷 No game records to upsert.');
     }
 
-    const result: any = { success: true, gamesProcessed: allGamesToUpsert.length };
+    const result: any = { success: true, gamesProcessed: uniqueGamesToUpsert.length };
     if (req?.query?.debug === 'true') result.logs = logs; // Use optional chaining for req
     return res.status(200).json(result);
 

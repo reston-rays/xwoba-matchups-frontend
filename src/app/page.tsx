@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/page.tsx
 'use client';
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { Matchup } from '@/types/player.types';
 import { Venue } from '@/types/database';
@@ -35,9 +34,10 @@ export default function HomePage() {
   const [allGamesWithMatchups, setAllGamesWithMatchups] = useState<GamesWithMatchupsAndVenues[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [displayLimit, setDisplayLimit] = useState<number>(20); // Default to 20
+  const [refreshError, setRefreshError] = useState<string | null>(null); // Separate error state for refresh
+  const [isRefreshingGames, setIsRefreshingGames] = useState(false);
 
-  useEffect(() => {
-    const fetchMatchups = async () => {
+  const fetchMatchups = useCallback(async () => {
       setError(null);
       setAllGamesWithMatchups(null); // Reset state for new fetch
       try {
@@ -50,13 +50,44 @@ export default function HomePage() {
         setError(err.message ?? 'Unknown error');
         setAllGamesWithMatchups([]); // Set to empty array on error to stop loading state
       }
-    };
-
-    fetchMatchups();
   }, [selectedDate]);
 
-  // Memoized top overall matchups
-  const displayedMatchups = React.useMemo(() => {
+  useEffect(() => {
+    fetchMatchups();
+  }, [fetchMatchups]);
+  
+  const handleRefreshGames = async () => {
+    setIsRefreshingGames(true);
+    setRefreshError(null); // Clear previous refresh errors
+    console.log('Attempting to refresh games data via /api/add-games...');
+    try {
+      const res = await fetch('/api/add-games');
+      if (!res.ok) {
+        let errorDetail = `HTTP error ${res.status}`;
+        try {
+          const errorData = await res.json();
+          errorDetail = errorData.error || errorData.message || errorDetail;
+        } catch (e) { /* Ignore if response is not JSON */ }
+        throw new Error(errorDetail);
+      }
+      console.log('/api/add-games called successfully. Game data refresh initiated.');
+      
+      // Add a small delay to allow the database to update
+      const delayInMilliseconds = 2000; // 2 seconds
+      await new Promise(resolve => setTimeout(resolve, delayInMilliseconds));
+      console.log(`Waited ${delayInMilliseconds / 1000} seconds for DB to update.`);
+
+      // Re-fetch matchups to reflect any new/updated games
+      await fetchMatchups();
+    } catch (err: any) {
+      console.error('Error calling /api/add-games:', err);
+      setRefreshError(`Failed to refresh games: ${err.message}`);
+    } finally {
+      setIsRefreshingGames(false);
+    }
+  };
+
+  const displayedMatchups = useMemo(() => {
     if (!allGamesWithMatchups) return null;
     // Flatten all matchups from all games
     const flatMatchups = allGamesWithMatchups.reduce((acc, game) => {
@@ -68,7 +99,7 @@ export default function HomePage() {
   }, [allGamesWithMatchups, displayLimit]);
 
   // Memoized data for "Matchups by Game" section
-  const gamesData = React.useMemo((): GameDisplayData[] => {
+  const gamesData = useMemo((): GameDisplayData[] => {
     if (!allGamesWithMatchups || allGamesWithMatchups.length === 0) return [];
 
     const gamesToDisplay: GameDisplayData[] = allGamesWithMatchups.map(game => {
@@ -97,30 +128,45 @@ export default function HomePage() {
       const gameTime = game.game_datetime_utc || null;
       const detailedState = game.detailed_state || null;
 
-      // Determine probable pitchers
-      // Home team's pitcher (faced by away team batters)
-      const homePitcherMatchup = game.matchups.find(m => m.batter_team === awayTeamAbbr);
-      const homeTeamProbablePitcherName = homePitcherMatchup?.pitcher_name;
-      const homeTeamProbablePitcherHand = homePitcherMatchup?.pitcher_hand;
+      // Pitcher for the Home Team (will be faced by Away Team batters)
+      const homeTeamsActualPitcherId = game.home_team_probable_pitcher_id;
+      let homeTeamsActualPitcherName: string | null | undefined = null;
+      let homeTeamsActualPitcherHand: 'L' | 'R' | null | undefined = null;
 
-      // Away team's pitcher (faced by home team batters)
-      const awayPitcherMatchup = game.matchups.find(m => m.batter_team === homeTeamAbbr);
-      const awayTeamProbablePitcherName = awayPitcherMatchup?.pitcher_name;
-      const awayTeamProbablePitcherHand = awayPitcherMatchup?.pitcher_hand;
+      // Pitcher for the Away Team (will be faced by Home Team batters)
+      const awayTeamsActualPitcherId = game.away_team_probable_pitcher_id;
+      let awayTeamsActualPitcherName: string | null | undefined = null;
+      let awayTeamsActualPitcherHand: 'L' | 'R' | null | undefined = null;
 
-      // --- END DEBUG LOGGING ---
-
+      // Find pitcher details from the matchups array using the IDs
+      if (homeTeamsActualPitcherId && game.matchups?.length > 0) {
+        const homePitcherMatchup = game.matchups.find(m => m.pitcher_id === homeTeamsActualPitcherId);
+        if (homePitcherMatchup) {
+          homeTeamsActualPitcherName = homePitcherMatchup.pitcher_name;
+          homeTeamsActualPitcherHand = homePitcherMatchup.pitcher_hand as 'L' | 'R' | null | undefined;
+        }
+      }
+      if (awayTeamsActualPitcherId && game.matchups?.length > 0) {
+        const awayPitcherMatchup = game.matchups.find(m => m.pitcher_id === awayTeamsActualPitcherId);
+        if (awayPitcherMatchup) {
+          awayTeamsActualPitcherName = awayPitcherMatchup.pitcher_name;
+          awayTeamsActualPitcherHand = awayPitcherMatchup.pitcher_hand as 'L' | 'R' | null | undefined;
+        }
+      }
 
       const homeTeamMatchups: Matchup[] = [];
       const awayTeamMatchups: Matchup[] = [];
 
       for (const m of game.matchups) {
+        // Ensure matchup has a pitcher_id to filter against
+        if (m.pitcher_id === undefined || m.pitcher_id === null) continue;
+
         // --- BEGIN DEBUG LOGGING ---
         // console.log(`    [GamePK: ${game.game_pk}] Checking Matchup: Batter '${m.batter_name}', BatterTeam: '${m.batter_team}'`);
         // --- END DEBUG LOGGING ---
-        if (m.batter_team === homeTeamAbbr) {
+        if (m.batter_team === homeTeamAbbr && awayTeamsActualPitcherId && m.pitcher_id === awayTeamsActualPitcherId) {
           homeTeamMatchups.push(m);
-        } else if (m.batter_team === awayTeamAbbr) {
+        } else if (m.batter_team === awayTeamAbbr && homeTeamsActualPitcherId && m.pitcher_id === homeTeamsActualPitcherId) {
           awayTeamMatchups.push(m);
         } else if (m.batter_team) { // Only log mismatch if batter_team is present but doesn't match
           // --- BEGIN DEBUG LOGGING ---
@@ -160,11 +206,11 @@ export default function HomePage() {
         detailedState,
         venue: game.venue || null, // Assign venue directly, fallback to null
         homeTeamMatchups,
-        homeTeamProbablePitcherName,
-        homeTeamProbablePitcherHand,
+        homeTeamProbablePitcherName: awayTeamsActualPitcherName, // Home batters face away pitcher
+        homeTeamProbablePitcherHand: awayTeamsActualPitcherHand,
         awayTeamMatchups,
-        awayTeamProbablePitcherName,
-        awayTeamProbablePitcherHand,
+        awayTeamProbablePitcherName: homeTeamsActualPitcherName, // Away batters face home pitcher
+        awayTeamProbablePitcherHand: homeTeamsActualPitcherHand,
       };
     });
     // API already sorts games by game_datetime_utc, so no need to re-sort here unless desired by gamePk
@@ -181,21 +227,58 @@ export default function HomePage() {
     }
   };
 
+  const handleDateChange = (offset: number) => {
+    const currentDate = new Date(selectedDate + 'T00:00:00'); // Ensure parsing as local date
+    currentDate.setDate(currentDate.getDate() + offset);
+    setSelectedDate(currentDate.toISOString().slice(0, 10));
+  };
+
   return (
     <main className="p-6">
       <h1 className="text-2xl font-bold mb-2">Matchup Analysis</h1>
 
-      {/* Date selector */}
-      <label className="block mb-4">
-        <span className="mr-2 font-medium">Select date:</span>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="border border-slate-600 bg-slate-700 px-2 py-1 rounded text-slate-100"
-          id="date-selector"
-        />
-      </label>
+      <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
+        {/* Date selector */}
+        <div className="flex items-center gap-2">
+          <span className="mr-1 font-medium">Date:</span>
+          <button
+            onClick={() => handleDateChange(-1)}
+            aria-label="Previous day"
+            className="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold rounded-md"
+          >
+            &lt;
+          </button>
+          <div className="relative">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-slate-600 bg-slate-700 px-2 py-1 rounded text-slate-100 appearance-none w-[130px] text-center"
+              id="date-selector"
+            />
+            {/* You might need to style the date picker icon or hide it if you want a cleaner look with just arrows */}
+          </div>
+          <button
+            onClick={() => handleDateChange(1)}
+            aria-label="Next day"
+            className="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold rounded-md"
+          >
+            &gt;
+          </button>
+        </div>
+
+
+        {/* Refresh Games Button */}
+        <button
+          onClick={handleRefreshGames}
+          disabled={isRefreshingGames}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isRefreshingGames ? 'Refreshing Games...' : 'Refresh Games'}
+        </button>
+      </div>
+      {/* Display refresh error if any */}
+      {refreshError && <div className="text-red-400 mb-4">Refresh Error: {refreshError}</div>}
 
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-3">Top {displayLimit} Overall Matchups</h2>
@@ -223,7 +306,7 @@ export default function HomePage() {
 
       {/* Error state */}
       {error && (
-        <div className="text-red-400 mb-4">
+        <div className="text-red-400 my-4">
           Error loading {selectedDate} matchups: {error}
         </div>
       )}
@@ -305,47 +388,31 @@ type MatchupTableProps = {
 
 function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTableProps) {
   const getXwobaColorClass = (xwoba: number): string => {
-    if (xwoba >= 0.350) { // Adjusted threshold slightly for example
-      return 'text-green-400 font-semibold'; // High value - Lighter Blue for dark bg
-    } else if (xwoba >= 0.300) { // Adjusted threshold slightly for example
-      return 'text-yellow-300 font-semibold'; // Mid value - Lighter Green
+if (typeof xwoba !== 'number') return ''; // Handle non-numeric inputs gracefully
+    if (xwoba >= 0.350) {
+      return 'text-cyan-400 font-semibold'; // Excellent
+    } else if (xwoba >= 0.325) {
+      return 'text-emerald-400 font-semibold'; // Above Average
+    } else if (xwoba >= 0.300) {
+      return 'text-slate-300 font-semibold'; //  Average
     } else {
-      return 'text-orange-300 font-semibold'; // Low value - Lighter Orange
+      return 'text-slate-400 font-semibold'; // Poor
     }
   };
 
-  const hardHitThresholds = React.useMemo(() => {
-    const validHardHitPcts = matchups
-      .map(m => m.avg_hard_hit_pct)
-      .filter(pct => typeof pct === 'number') as number[];
-
-    if (validHardHitPcts.length < 2) { // Need at least 2 distinct values for a meaningful range
-      return null;
-    }
-
-    const minPct = Math.min(...validHardHitPcts);
-    const maxPct = Math.max(...validHardHitPcts);
-
-    // If all values are the same, range will be 0.
-    // They will all fall into the "high" category by the logic below.
-    const range = maxPct - minPct;
-    const threshold1 = minPct + range / 3;
-    const threshold2 = minPct + 2 * range / 3;
-
-    return { threshold1, threshold2 };
-  }, [matchups]);
-
   const getHardHitColorClass = (hardHitPctValue: number | undefined | null): string => {
-    if (typeof hardHitPctValue !== 'number' || !hardHitThresholds) {
+    if (typeof hardHitPctValue !== 'number') {
       return ''; // No color if no data or thresholds
     }
-
-    if (hardHitPctValue >= hardHitThresholds.threshold2) {
-      return 'text-indigo-400 font-semibold'; // High value - Lighter Indigo
-    } else if (hardHitPctValue >= hardHitThresholds.threshold1) {
-      return 'text-sky-400 font-semibold';    // Mid value - Lighter Sky Blue
+    // The hardHitPctValue is a decimal (e.g., 0.45 for 45%), so we compare against decimals.
+    if (hardHitPctValue >= 0.40) { // 45% and above
+      return 'text-cyan-400 font-semibold'; // Excellent
+    } else if (hardHitPctValue >= 0.35) { // 40% to 44.9%
+      return 'text-emerald-400 font-semibold';  // Good
+    } else if (hardHitPctValue >= 0.30) { // 35% to 39.9%
+      return 'text-slate-300 font-semibold';  // Above Average
     } else {
-      return 'text-teal-400 font-semibold';   // Low value - Lighter Teal
+      return 'text-slate-400 font-semibold';    // Poor (Below 30%)
     }
   };
 
@@ -385,7 +452,7 @@ function MatchupTable({ title, matchups, isGameSpecificView = false }: MatchupTa
                   <td className="px-3 py-2">{m.batter_name} ({m.batter_hand})</td>
                   {!isGameSpecificView && <td className="px-3 py-2 hidden sm:table-cell">{m.batter_team || '-'}</td>}
                   <td className="px-3 py-2 text-center">{m.lineup_position || '-'}</td>
-                  {!isGameSpecificView && <td className="px-3 py-2">{m.pitcher_name}</td>}
+                  {!isGameSpecificView && <td className="px-3 py-2">{m.pitcher_name} ({m.pitcher_hand})</td>}
                   {!isGameSpecificView && <td className="px-3 py-2 hidden sm:table-cell">{m.pitcher_team || '-'}</td>}
                   <td className={`px-3 py-2 text-right ${getXwobaColorClass(m.avg_xwoba)}`}>
                     {m.avg_xwoba.toFixed(3)}
