@@ -119,7 +119,21 @@ export default async function handler(
     }
 
     // 4. Fetch boxscores to get batting orders and then gather lookup pairs & player IDs
-    const lookupPairs: Array<{ gamePk: string | number; homeTeamAbbr: string | null; awayTeamAbbr: string | null; pit: number; bat: number; batName: string; pitName: string; lineupPosition: number | null; batterTeam: string | null; pitcherTeam: string | null; }> = [];
+    type LookupPair = {
+      gamePk: string | number;
+      homeTeamId: number;
+      awayTeamId: number;
+      homeTeamAbbr: string | null;
+      awayTeamAbbr: string | null;
+      pit: number;
+      bat: number;
+      batName: string;
+      pitName: string;
+      lineupPosition: number | null;
+      batterTeam: string | null;
+      pitcherTeam: string | null;
+    };
+    const lookupPairs: LookupPair[] = [];
     const playerIds = new Set<number>();
     // Store batting orders: Map<gamePk_teamId, playerId[]>
     // Example key: "712345_119" -> [playerId1, playerId2, ...]
@@ -173,13 +187,16 @@ export default async function handler(
       const processTeamLineup = (
         teamType: 'home' | 'away',
         opponentStarter: { id: number; fullName: string },
-        gameData: any // Pass the full game object 'g'
+        gameData: any,
+        gameHomeTeamIdParam: number,
+        gameAwayTeamIdParam: number,
+        actualGameHomeAbbrParam: string | null,
+        actualGameAwayAbbrParam: string | null
       ) => {
         const teamData = gameData.teams[teamType];
         const teamId = teamData.team.id;
         const batterTeamIdentifier = getTeamIdentifier(teamId, teamData.team.name);
         
-        const gamePk = gameData.gamePk;
         const opponentTeamId = (teamType === 'home' ? gameData.teams.away.team.id : gameData.teams.home.team.id);
         const pitcherTeamIdentifier = getTeamIdentifier(opponentTeamId, (teamType === 'home' ? gameData.teams.away.team.name : gameData.teams.home.team.name));
         
@@ -201,9 +218,11 @@ export default async function handler(
           const lineupPosition = lineupIndex !== -1 ? lineupIndex + 1 : null;
 
           lookupPairs.push({
-            gamePk,
-            homeTeamAbbr: actualGameHomeAbbr,
-            awayTeamAbbr: actualGameAwayAbbr,
+            gamePk: gameData.gamePk,
+            homeTeamId: gameHomeTeamIdParam,
+            awayTeamId: gameAwayTeamIdParam,
+            homeTeamAbbr: actualGameHomeAbbrParam,
+            awayTeamAbbr: actualGameAwayAbbrParam,
             bat: playerId,
             pit: opponentStarter.id,
             batName: p.person.fullName,
@@ -215,8 +234,8 @@ export default async function handler(
         });
       };
 
-      processTeamLineup('home', awayStarter, g);
-      processTeamLineup('away', homeStarter, g);
+      processTeamLineup('home', awayStarter, g, gameHomeTeamId, gameAwayTeamId, actualGameHomeAbbr, actualGameAwayAbbr);
+      processTeamLineup('away', homeStarter, g, gameHomeTeamId, gameAwayTeamId, actualGameHomeAbbr, actualGameAwayAbbr);
 
       log(`🔍 Processed game ${g.gamePk}: ${lookupPairs.length} matchups found`);
     }
@@ -237,7 +256,7 @@ export default async function handler(
         
         const { data: batchData, error: batchError } = await supabaseServer
           .from('player_splits')
-          .select('player_id, season, player_type,vs_handedness,xwoba,avg_launch_angle,barrels_per_pa,hard_hit_pct,avg_exit_velocity')
+          .select('player_id, season, player_type,vs_handedness,xwoba,avg_launch_angle,barrels_per_pa,hard_hit_pct,avg_exit_velocity,k_percent,bb_percent,iso,swing_miss_percent')
           .eq('season', 0)
           .in('player_id', playerIdsBatch) // Fetch all season 0 splits for players in the batch
           .limit(playerIdsBatch.length * 6); // Increased limit: assuming max ~6 relevant splits (e.g., B/P vs L/R/S) per player for season 0
@@ -275,7 +294,7 @@ export default async function handler(
     }
 
     // 7. Build upserts
-    const upserts = lookupPairs.reduce<any[]>((acc, { gamePk, homeTeamAbbr, awayTeamAbbr, pit, bat, batName, pitName, lineupPosition, batterTeam, pitcherTeam }) => {
+    const upserts = lookupPairs.reduce<any[]>((acc, { gamePk, homeTeamId, awayTeamId, homeTeamAbbr, awayTeamAbbr, pit, bat, batName, pitName, lineupPosition, batterTeam, pitcherTeam }) => {
       const batSide = batMap.get(bat);
       const pitSide = pitMap.get(pit);
 
@@ -306,14 +325,14 @@ export default async function handler(
 
       const pitcherSplitData = allSplits?.find((s: any) =>
         s.player_type === 'pitcher' && s.player_id === pit && s.vs_handedness === handednessPitcherFaces
-      );
+      );      
 
       // Batter split data lookup remains the same: it's how the batter performs against the pitcher's actual throwing hand.
       // The player_splits table for a batter should have vs_handedness = 'R' (meaning vs RHP)
       // and vs_handedness = 'L' (meaning vs LHP). For a switch hitter, these entries already
       // reflect them batting from the optimal side against that type of pitcher.
       const batterSplitData = allSplits?.find((s: any) =>
-        s.player_type === 'batter' && s.player_id === bat && s.vs_handedness === pitSide
+        s.player_type === 'batter' && s.player_id === bat && s.vs_handedness === pitSide // pitSide is the pitcher's actual throwing hand
       );
       let detailedSkipReason = "";
 
@@ -323,12 +342,18 @@ export default async function handler(
         pitcherSplitData.avg_launch_angle != null && batterSplitData.avg_launch_angle != null &&
         pitcherSplitData.barrels_per_pa != null && batterSplitData.barrels_per_pa != null &&
         pitcherSplitData.hard_hit_pct != null && batterSplitData.hard_hit_pct != null &&
-        pitcherSplitData.avg_exit_velocity != null && batterSplitData.avg_exit_velocity != null
+        pitcherSplitData.avg_exit_velocity != null && batterSplitData.avg_exit_velocity != null &&
+        pitcherSplitData.k_percent != null && batterSplitData.k_percent != null &&
+        pitcherSplitData.bb_percent != null && batterSplitData.bb_percent != null &&
+        pitcherSplitData.iso != null && batterSplitData.iso != null &&
+        pitcherSplitData.swing_miss_percent != null && batterSplitData.swing_miss_percent != null
       ) {
         // All conditions met, add to upserts
         acc.push({
           game_date: gameDate,
           game_pk: gamePk,
+          home_team_id: homeTeamId,
+          away_team_id: awayTeamId,
           game_home_team_abbreviation: homeTeamAbbr,
           game_away_team_abbreviation: awayTeamAbbr,
           batter_id: bat,
@@ -346,22 +371,35 @@ export default async function handler(
           avg_barrels_per_pa: (pitcherSplitData.barrels_per_pa + batterSplitData.barrels_per_pa) / 2,
           avg_hard_hit_pct: (pitcherSplitData.hard_hit_pct + batterSplitData.hard_hit_pct) / 2,
           avg_exit_velocity: (pitcherSplitData.avg_exit_velocity + batterSplitData.avg_exit_velocity) / 2,
+          avg_k_percent: (pitcherSplitData.k_percent + batterSplitData.k_percent) / 2,
+          avg_bb_percent: (pitcherSplitData.bb_percent + batterSplitData.bb_percent) / 2,
+          avg_iso: (pitcherSplitData.iso + batterSplitData.iso) / 2,
+          avg_swing_miss_percent: (pitcherSplitData.swing_miss_percent + batterSplitData.swing_miss_percent) / 2,
         });
       } else {
         // Determine the exact reason for skipping
         if (!pitcherSplitData) {
-          detailedSkipReason += `Pitcher split data not found (for PitID:${pit} vs ${handednessPitcherFaces}). `;
+          detailedSkipReason += `Pitcher split data not found (Criteria: PitID:${pit}, Type:pitcher, VsHand:${handednessPitcherFaces}, Season:0). `;
         } else {
           if (pitcherSplitData.xwoba == null) detailedSkipReason += `Pitcher xwoba is null. `;
           if (pitcherSplitData.avg_launch_angle == null) detailedSkipReason += `Pitcher LA is null. `;
-          // Add more checks for other pitcher stats if needed for debugging
+          if (pitcherSplitData.barrels_per_pa == null) detailedSkipReason += `Pitcher barrels_per_pa is null. `;
+          if (pitcherSplitData.hard_hit_pct == null) detailedSkipReason += `Pitcher hard_hit_pct is null. `;
+          if (pitcherSplitData.avg_exit_velocity == null) detailedSkipReason += `Pitcher avg_exit_velocity is null. `;
+          if (pitcherSplitData.k_percent == null) detailedSkipReason += `Pitcher k_percent is null. `;
+          if (pitcherSplitData.bb_percent == null) detailedSkipReason += `Pitcher bb_percent is null. `;
+          if (pitcherSplitData.iso == null) detailedSkipReason += `Pitcher iso is null. `;
+          if (pitcherSplitData.swing_miss_percent == null) detailedSkipReason += `Pitcher swing_miss_percent is null. `;
         }
         if (!batterSplitData) {
-          detailedSkipReason += `Batter split data not found (for BatID:${bat} vs ${pitSide}). `;
+          detailedSkipReason += `Batter split data not found (Criteria: BatID:${bat}, Type:batter, VsHand:${pitSide}, Season:0). `;
         } else {
           if (batterSplitData.xwoba == null) detailedSkipReason += `Batter xwoba is null. `;
           if (batterSplitData.avg_launch_angle == null) detailedSkipReason += `Batter LA is null. `;
-          // Add more checks for other batter stats if needed for debugging
+          if (batterSplitData.k_percent == null) detailedSkipReason += `Batter k_percent is null. `;
+          if (batterSplitData.bb_percent == null) detailedSkipReason += `Batter bb_percent is null. `;
+          if (batterSplitData.iso == null) detailedSkipReason += `Batter iso is null. `;
+          if (batterSplitData.swing_miss_percent == null) detailedSkipReason += `Batter swing_miss_percent is null. `;
         }
         log(`⚠️ Skipping matchup Bat:${bat}(${batName}) vs Pit:${pit}(${pitName}). Reason(s): ${detailedSkipReason || "One or more required player_split stats are null or records not found."}`);
       }

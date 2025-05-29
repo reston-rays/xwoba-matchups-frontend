@@ -1,185 +1,190 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/api/matchups.ts
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseServer } from '@/lib/supabaseServerClient';
-import { Matchup, Game, Venue } from '@/types/database';
+import { Game, Matchup, Venue } from '@/types/database';  // :contentReference[oaicite:1]{index=1} :contentReference[oaicite:3]{index=3}
 
-type ErrorResponse = { error: string };
-
-// Updated type to represent a Game object augmented with its matchups, venue, and pitcher details
 export interface GamesWithMatchupsAndVenues extends Game {
-  // Existing fields from Game type are inherited
-  home_team_name?: string | null; // Assuming these might be in your Game type or you want to add them
-  away_team_name?: string | null;
-  home_team_abbreviation?: string | null;
-  away_team_abbreviation?: string | null;
+  venue?: Venue;
   home_pitcher_details?: { name: string | null; hand: 'L' | 'R' | null } | null;
   away_pitcher_details?: { name: string | null; hand: 'L' | 'R' | null } | null;
-  matchups: Matchup[];
-  venue?: Venue; // Optional venue information if needed
+  away_team_matchups: Matchup[];
+  home_team_matchups: Matchup[];
 }
 
-// Helper type for pitcher data from the 'players' table
-type PitcherInfo = { player_id: number; full_name: string | null; pitch_hand_code: 'L' | 'R' | null };
+type ErrorResponse = { error: string };
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<GamesWithMatchupsAndVenues[] | ErrorResponse>
 ) {
   try {
-    // const requestLogs: string[] = [];
-    const log = (message: string) => {
-      // Log to server console
-      console.log(`[API /api/matchups] ${message}`);
-      // Optionally, accumulate logs to return in response if debugging
-      // requestLogs.push(message);
-    };
-
-    // 1. Determine date
+    // 1. Determine date (PT‐shifted if unspecified)
     const dateParam = typeof req.query.date === 'string' ? req.query.date : null;
-    let gameDate  = dateParam;
-
+    let gameDate = dateParam;
     if (!gameDate) {
       const now = new Date();
-      now.setHours(now.getHours() - 8); // Approximate PT offset (UTC-8)
+      now.setHours(now.getHours() - 8); // PT offset
       gameDate = now.toISOString().slice(0, 10);
     }
-    log(`Processing request for date: ${gameDate}`);
 
+    // 2. Load games
     const { data: games, error: gamesError } = await supabaseServer
       .from('games')
-      .select(`*`) // Select all available columns from the 'games' table
+      .select('*')
       .eq('official_date', gameDate)
       .order('game_datetime_utc', { ascending: true });
-    log(`Fetched ${games?.length || 0} games from 'games' table.`);
 
     if (gamesError) {
-      log(`Error querying games: ${gamesError.message}`);
+      console.error('Error querying games:', gamesError);
       return res.status(500).json({ error: gamesError.message });
     }
+    if (!games || games.length === 0) return res.status(200).json([]);
 
-    if (!games || games.length === 0) {
-      log('No games found for this date. Returning empty array.');
-      return res.status(200).json([]); // No games for this date
-    }
-
-    // 1.5 Collect all unique probable pitcher IDs from the fetched games
-    const pitcherIds = new Set<number>();
-    games.forEach(game => {
-      if (game.home_team_probable_pitcher_id) {
-        pitcherIds.add(game.home_team_probable_pitcher_id);
-      }
-      if (game.away_team_probable_pitcher_id) {
-        pitcherIds.add(game.away_team_probable_pitcher_id);
-      }
-    });
-
-    // Fetch pitcher details if there are any pitcher IDs
-    const pitcherDetailsMap = new Map<number, { name: string | null; hand: 'L' | 'R' | null }>();
-    if (pitcherIds.size > 0) {
-      log(`Fetching details for ${pitcherIds.size} unique probable pitcher IDs.`);
-      const { data: playersData, error: playersError } = await supabaseServer
-        .from('players') // Assuming your players table is named 'players'
-        .select('player_id, full_name, pitch_hand_code') // Use full_name and pitch_hand_code as per your players table
-        .in('player_id', Array.from(pitcherIds));
-
-      if (playersError) {
-        log(`Error fetching pitcher details: ${playersError.message}`);
-        // Continue without pitcher details, or handle error more strictly
-      } else if (playersData) {
-        (playersData as PitcherInfo[]).forEach(p => {
-          pitcherDetailsMap.set(p.player_id, {
-            name: p.full_name,
-            hand: p.pitch_hand_code
-          });
-        });
-        log(`Successfully fetched and mapped details for ${pitcherDetailsMap.size} pitchers.`);
-      }
-    }
-
-    // 2. Fetch all daily matchups for the given date
-    const { data: allMatchupsForDate, error: matchupsError } = await supabaseServer
+    // 3. Load all matchups for date
+    const { data: allMatchups, error: matchupsError } = await supabaseServer
       .from('daily_matchups')
-      .select('*') // Specify the return type
+      .select('*')
       .eq('game_date', gameDate)
       .order('avg_xwoba', { ascending: false });
-    log(`Fetched ${allMatchupsForDate?.length || 0} total matchups from 'daily_matchups' table for the date.`);
 
     if (matchupsError) {
-      log(`Error querying matchups: ${matchupsError.message}`);
+      console.error('Error querying matchups:', matchupsError);
       return res.status(500).json({ error: matchupsError.message });
     }
 
-    if (!allMatchupsForDate || allMatchupsForDate.length === 0) {
-      log('No matchups found in daily_matchups for this date. All games will have empty matchup arrays.');
-      // Fall through to return games with empty matchups
-    }
-
-    // 2.5 Fetch venue information for each game
-    const venueIds = Array.from(new Set(games.map(game => game.venue_id)));
-    const { data: venues, error: venuesError } = await supabaseServer
+    // 4. Load venue info
+    const venueIds = Array.from(new Set(games.map(g => g.venue_id)));
+    const { data: venues } = await supabaseServer
       .from('venues')
       .select('*')
       .in('id', venueIds);
-    log(`Fetched ${venues?.length || 0} venues from 'venues' table.`);
 
-    if (venuesError) {
-      log(`Error querying venues: ${venuesError.message}`);
-      return res.status(500).json({ error: venuesError.message });
-    }
-
-    if (!venues || venues.length === 0) {
-      log('No venues found for the games. Venue information will be omitted.');
-      // Fall through to return games without venue information
-    }
-
-    // Create a map for quick venue lookup
     const venueMap = new Map<number, Venue>();
-    if (venues) {
-      venues.forEach(venue => venueMap.set(venue.id, venue));
+    venues?.forEach(v => venueMap.set(v.id, v));
+
+    // 4.5 Fetch all teams to map abbreviations to IDs
+    const { data: teamsData, error: teamsError } = await supabaseServer
+      .from('teams')
+      .select('id, abbreviation');
+
+    if (teamsError) {
+      console.error('Error querying teams for abbreviation mapping:', teamsError);
+      // Continue without this mapping, fallback might not work as well
+    }
+    const teamAbbrToIdMap = new Map<string, number>();
+    teamsData?.forEach(team => {
+      if (team.abbreviation) {
+        teamAbbrToIdMap.set(team.abbreviation, team.id);
+      }
+    });
+
+    // 5. Fetch probable‐pitcher details from 'players' table
+    const pitcherIds = new Set<number>();
+    games.forEach(g => {
+      if (g.home_team_probable_pitcher_id) pitcherIds.add(g.home_team_probable_pitcher_id);
+      if (g.away_team_probable_pitcher_id) pitcherIds.add(g.away_team_probable_pitcher_id);
+    });
+
+    type PitcherInfo = { player_id: number; full_name: string; pitch_hand_code: 'L' | 'R' | null };
+    const pitcherDetailsMap = new Map<number, { name: string | null; hand: 'L' | 'R' | null }>();
+    if (pitcherIds.size) {
+      const { data: playersData } = await supabaseServer
+        .from('players')
+        .select('player_id, full_name, pitch_hand_code')
+        .in('player_id', Array.from(pitcherIds));
+      playersData?.forEach(p => {
+        pitcherDetailsMap.set(p.player_id, { name: p.full_name, hand: p.pitch_hand_code });
+      });
     }
 
-    // 3. Combine games with their respective matchups
-    const GamesWithMatchupsAndVenues: GamesWithMatchupsAndVenues[] = games.map((game) => {
-      log(`Processing game_pk: ${game.game_pk} (type: ${typeof game.game_pk})`);
-      
-      const homePitcherDetails = game.home_team_probable_pitcher_id ? pitcherDetailsMap.get(game.home_team_probable_pitcher_id) || null : null;
-      const awayPitcherDetails = game.away_team_probable_pitcher_id ? pitcherDetailsMap.get(game.away_team_probable_pitcher_id) || null : null;
+    // 6. Build and return combined payload
+    const result: GamesWithMatchupsAndVenues[] = games.map(game => {
+      // all matchups for *this* game
+      const gameMatchups = (allMatchups || []).filter(m => m.game_pk === game.game_pk);
+      let awayTeamMatchups: Matchup[];
+      let homeTeamMatchups: Matchup[];
 
-      const gameSpecificMatchups = (allMatchupsForDate || []).filter(
-        (matchup) => {
-          // Both matchup.game_pk and game.game_pk should be numbers if from int8 columns
-          const isMatch = matchup.game_pk === game.game_pk;
-          if (!isMatch && (matchup.game_pk !== undefined && game.game_pk !== undefined)) { // Log only if both are defined but don't match
-            // Log detailed comparison for a specific game_pk if needed for deep debugging
-            // if (game.game_pk === 777753) { // Example: focus on a known game_pk
-            //   log(`  [Game ${game.game_pk}] DETAILED NO MATCH: Number(matchup.game_pk)='${Number(matchup.game_pk)}' (original matchup.game_pk='${matchup.game_pk}', type: ${typeof matchup.game_pk}) vs game.game_pk='${game.game_pk}' (type: ${typeof game.game_pk})`);
-            // }
+      // Determine Away Team Matchups (vs. Home Pitcher)
+      if (game.away_batting_order && game.away_batting_order.length > 0) {
+        // Lineup is published
+        awayTeamMatchups = gameMatchups.filter(
+          m =>
+            game.away_batting_order!.includes(m.batter_id) &&
+            m.pitcher_id === game.home_team_probable_pitcher_id
+        );
+      } else {
+        // Lineup not published, use full active roster for the away team
+        // Fallback: Compare batter_team (abbreviation) from matchup with game's away_team_id
+        awayTeamMatchups = gameMatchups.filter(
+          m => {
+            const awayTeamIdFromAbbr = m.batter_team ? teamAbbrToIdMap.get(m.batter_team) : null;
+            return awayTeamIdFromAbbr === game.away_team_id &&
+            m.pitcher_id === game.home_team_probable_pitcher_id
+          });
+      }
+      // Sort awayTeamMatchups: by lineup_position (nulls last), then by avg_xwoba descending
+      awayTeamMatchups.sort((a, b) => {
+        if (a.lineup_position !== null && b.lineup_position === null) return -1; // a comes first
+        if (a.lineup_position === null && b.lineup_position !== null) return 1;  // b comes first
+        if (a.lineup_position !== null && b.lineup_position !== null) {
+          if (a.lineup_position !== b.lineup_position) {
+            return a.lineup_position - b.lineup_position; // Sort by lineup position
           }
-          return isMatch;
         }
-      );
-      log(`  Found ${gameSpecificMatchups.length} matchups for game_pk: ${game.game_pk}.`);
-      // If you want to see the actual matchup_pks that were filtered for a specific game:
-      // if (gameSpecificMatchups.length > 0) {
-      //   log(`    Matchup game_pks for game ${game.game_pk}: ${gameSpecificMatchups.map(m => m.game_pk).join(', ')}`);
-      // }
+        // If lineup_position is the same or both are null, sort by avg_xwoba descending
+        return b.avg_xwoba - a.avg_xwoba;
+      });
 
-      const gameVenue = game.venue_id ? venueMap.get(game.venue_id) : undefined;
+
+
+      // Determine Home Team Matchups (vs. Away Pitcher)
+      if (game.home_batting_order && game.home_batting_order.length > 0) {
+        homeTeamMatchups = gameMatchups.filter(
+          m =>
+            game.home_batting_order!.includes(m.batter_id) &&
+            m.pitcher_id === game.away_team_probable_pitcher_id
+        );
+      } else {
+        // Fallback: Compare batter_team (abbreviation) from matchup with game's home_team_id
+        homeTeamMatchups = gameMatchups.filter(
+          m => {
+            const homeTeamIdFromAbbr = m.batter_team ? teamAbbrToIdMap.get(m.batter_team) : null;
+            return homeTeamIdFromAbbr === game.home_team_id &&
+            m.pitcher_id === game.away_team_probable_pitcher_id
+          });
+      }
+      // Sort homeTeamMatchups: by lineup_position (nulls last), then by avg_xwoba descending
+      homeTeamMatchups.sort((a, b) => {
+        if (a.lineup_position !== null && b.lineup_position === null) return -1; // a comes first
+        if (a.lineup_position === null && b.lineup_position !== null) return 1;  // b comes first
+        if (a.lineup_position !== null && b.lineup_position !== null) {
+          if (a.lineup_position !== b.lineup_position) {
+            return a.lineup_position - b.lineup_position; // Sort by lineup position
+          }
+        }
+        // If lineup_position is the same or both are null, sort by avg_xwoba descending
+        return b.avg_xwoba - a.avg_xwoba;
+      });
 
       return {
         ...game,
-        venue: gameVenue,
-        home_pitcher_details: homePitcherDetails,
-        away_pitcher_details: awayPitcherDetails,
-        matchups: gameSpecificMatchups,
+        venue: venueMap.get(game.venue_id) || undefined,
+        home_pitcher_details: game.home_team_probable_pitcher_id
+          ? pitcherDetailsMap.get(game.home_team_probable_pitcher_id) || null
+          : null,
+        away_pitcher_details: game.away_team_probable_pitcher_id
+          ? pitcherDetailsMap.get(game.away_team_probable_pitcher_id) || null
+          : null,
+        away_team_matchups: awayTeamMatchups,
+        home_team_matchups: homeTeamMatchups,
       };
     });
 
-    return res.status(200).json(GamesWithMatchupsAndVenues);
-  } catch (err: unknown) {
-    console.error('[API /api/matchups] Unexpected error:', err); // Added prefix for clarity
-    const message = err instanceof Error ? err.message : 'Internal server error';
-    return res.status(500).json({ error: message });
+    return res.status(200).json(result);
+  } catch (err: any) {
+    console.error('Unexpected error in /api/matchups:', err);
+    return res.status(500).json({ error: err.message });
   }
 }

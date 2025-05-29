@@ -132,6 +132,8 @@ export interface PlayerSplit {
   last_updated: string; // timestamp with time zone, Not Null, Default now()
   hrs: number | null; // integer, Nullable
   swing_miss_percent: number | null; // numeric(5, 4), Nullable
+  k_percent: number | null; // numeric(5, 4), Nullable. Strikeout percentage.
+  bb_percent: number | null; // numeric(5, 4), Nullable. Walk percentage.
   hyper_speed: number | null; // numeric(4, 1), Nullable
 }
 
@@ -154,4 +156,10 @@ export interface Matchup  {
   game_away_team_abbreviation: string | null; // From daily_matchups.game_away_team_abbreviation (varchar(10) null)
   pitcher_hand: 'L' | 'R' | null; // From daily_matchups.pitcher_hand (text null)
   batter_hand: 'L' | 'R' | 'S' | null; // From daily_matchups.batter_hand (text null)
+  avg_k_percent: number; // From daily_matchups.avg_k_percent (double precision not null)
+  avg_bb_percent: number; // From daily_matchups.avg_bb_percent (double precision not null)
+  avg_iso: number; // From daily_matchups.avg_iso (double precision not null)
+  avg_swing_miss_percent: number; // From daily_matchups.avg_swing_miss_percent (double precision not null)
+  home_team_id: number | null; // From daily_matchups.home_team_id (integer null)
+  away_team_id: number | null; // From daily_matchups.away_team_id (integer null)
 }

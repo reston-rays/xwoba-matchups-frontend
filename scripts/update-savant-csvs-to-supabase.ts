@@ -175,6 +175,10 @@ async function processAndUploadSavantCsvs(): Promise<void> {
           swing_miss_percent: parseFloatAndRound(row.swing_miss_percent, 4, true), // CSV: swing_miss_percent, DB: numeric(5,4)
           hyper_speed: parseFloatAndRound(row.hyper_speed, 1),                   // CSV: hyper_speed, DB: numeric(4,1)
 
+          // Add missing properties for PlayerSplit
+          k_percent: parseFloatAndRound(row.k_percent, 4, true), // CSV: k_percent (as percentage, e.g., "23.4")
+          bb_percent: parseFloatAndRound(row.bb_percent, 4, true), // CSV: bb_percent (as percentage, e.g., "8.7")
+
           last_updated: new Date().toISOString(), // Set last_updated to current time
         })).filter((record): record is PlayerSplit => // Type guard to ensure non-null PK fields
           record.player_id !== null &&
@@ -269,6 +273,10 @@ async function processAndUploadWeightedStats(): Promise<void> {
       groundball_pct: null, // Not in weighted_player_stats.csv
       line_drive_pct: null,
       flyball_pct: null,
+
+      // Add missing properties for PlayerSplit
+      k_percent: parseFloatOrNull(row.weighted_k_percent), // Read from weighted_player_stats.csv
+      bb_percent: parseFloatOrNull(row.weighted_bb_percent), // Read from weighted_player_stats.csv
 
       last_updated: new Date().toISOString(),
     })).filter((record): record is PlayerSplit => // Type guard for weighted stats

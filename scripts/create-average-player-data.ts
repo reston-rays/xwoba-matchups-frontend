@@ -54,7 +54,9 @@ type WeightedStatCalculationKeys =
   | 'swing_miss_percent'
   | 'hyper_speed'
   | 'hrs'
-  | 'barrels_per_pa';
+  | 'barrels_per_pa'
+  | 'k_percent'
+  | 'bb_percent';
 
 // This type represents the data structure required by computeWeightedStats,
 // derived from PlayerSplit fields and ensuring they are non-nullable.
@@ -82,6 +84,8 @@ interface ComputedWeightedStats {
   weightedHyperSpeed: number;
   weightedBarrelsPerPa: number;
   weightedHrs: number; // Weighted count
+  weightedKPercent: number;
+  weightedBbPercent: number;
   totalPA: number; // Adding this to capture sumWeight
 }
 
@@ -110,6 +114,8 @@ interface WeightedCsvRow {
   weighted_hyper_speed: number | null;
   weighted_barrels_per_pa: number | null;
   weighted_hrs: number | null;
+  weighted_k_percent: number | null;
+  weighted_bb_percent: number | null;
   total_pa: number | null;
   contributing_seasons: string; // e.g., "2024,2023"
   last_updated: string;
@@ -144,6 +150,8 @@ function computeWeightedStats(
   let sumHyperSpeed = 0;
   let sumBarrelsPPA = 0;
   let sumHrs = 0;
+  let sumKPercent = 0;
+  let sumBbPercent = 0;
 
   for (const stat of data) {
     const rw = recencyWeights[stat.season] ?? 0;
@@ -167,6 +175,8 @@ function computeWeightedStats(
     sumHyperSpeed += w * stat.hyper_speed;
     sumBarrelsPPA += w * stat.barrels_per_pa;
     sumHrs += w * stat.hrs;
+    sumKPercent += w * stat.k_percent;
+    sumBbPercent += w * stat.bb_percent;
 
     sumPA += stat.pa; // Total plate appearances for this player
   }
@@ -190,6 +200,8 @@ function computeWeightedStats(
         weightedHyperSpeed: NaN,
         weightedBarrelsPerPa: NaN,
         weightedHrs: NaN,
+        weightedKPercent: NaN,
+        weightedBbPercent: NaN,
         totalPA: 0,
     };
   }
@@ -212,6 +224,8 @@ function computeWeightedStats(
     weightedHyperSpeed: sumHyperSpeed / sumWeight,
     weightedBarrelsPerPa: sumBarrelsPPA / sumWeight,
     weightedHrs: sumHrs / sumWeight,
+    weightedKPercent: sumKPercent / sumWeight,
+    weightedBbPercent: sumBbPercent / sumWeight,
     totalPA: sumPA, // Total plate appearances across all seasons
   };
 }
@@ -314,7 +328,9 @@ async function main() {
         typeof split.swing_miss_percent === 'number' &&
         typeof split.hyper_speed === 'number' &&
         typeof split.barrels_per_pa === 'number' &&
-        typeof split.hrs === 'number'
+        typeof split.hrs === 'number' &&
+        typeof split.k_percent === 'number' &&
+        typeof split.bb_percent === 'number'
       ) {
         seasonStatsForCalc.push({
           season: split.season, // Already number
@@ -336,6 +352,8 @@ async function main() {
           hyper_speed: split.hyper_speed as number,
           barrels_per_pa: split.barrels_per_pa as number, // Known to be number
           hrs: split.hrs as number,
+          k_percent: split.k_percent as number,
+          bb_percent: split.bb_percent as number,
         } as SeasonStatInput); // Assert as SeasonStatInput to satisfy TypeScript
         contributingSeasonsSet.add(split.season);
       }
@@ -369,6 +387,8 @@ async function main() {
           weighted_hyper_speed: computed.weightedHyperSpeed,
           weighted_barrels_per_pa: computed.weightedBarrelsPerPa,
           weighted_hrs: computed.weightedHrs,
+          weighted_k_percent: computed.weightedKPercent,
+          weighted_bb_percent: computed.weightedBbPercent,
           total_pa: computed.totalPA,
           contributing_seasons: Array.from(contributingSeasonsSet).sort((a,b) => b-a).join(','),
           last_updated: new Date().toISOString(),
