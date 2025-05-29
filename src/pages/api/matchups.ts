@@ -2,17 +2,25 @@
 // src/pages/api/matchups.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseServer } from '@/lib/supabaseServerClient';
-import { Matchup } from '@/types/player.types';
-import { Game } from '@/types/database';
-import { Venue } from '@/types/database';
+import { Matchup, Game, Venue } from '@/types/database';
 
 type ErrorResponse = { error: string };
 
-// New type to represent a Game object augmented with its matchups
+// Updated type to represent a Game object augmented with its matchups, venue, and pitcher details
 export interface GamesWithMatchupsAndVenues extends Game {
+  // Existing fields from Game type are inherited
+  home_team_name?: string | null; // Assuming these might be in your Game type or you want to add them
+  away_team_name?: string | null;
+  home_team_abbreviation?: string | null;
+  away_team_abbreviation?: string | null;
+  home_pitcher_details?: { name: string | null; hand: 'L' | 'R' | null } | null;
+  away_pitcher_details?: { name: string | null; hand: 'L' | 'R' | null } | null;
   matchups: Matchup[];
   venue?: Venue; // Optional venue information if needed
 }
+
+// Helper type for pitcher data from the 'players' table
+type PitcherInfo = { player_id: number; full_name: string | null; pitch_hand_code: 'L' | 'R' | null };
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,7 +48,7 @@ export default async function handler(
 
     const { data: games, error: gamesError } = await supabaseServer
       .from('games')
-      .select('*') // Specify the return type for better type safety
+      .select(`*`) // Select all available columns from the 'games' table
       .eq('official_date', gameDate)
       .order('game_datetime_utc', { ascending: true });
     log(`Fetched ${games?.length || 0} games from 'games' table.`);
@@ -53,6 +61,40 @@ export default async function handler(
     if (!games || games.length === 0) {
       log('No games found for this date. Returning empty array.');
       return res.status(200).json([]); // No games for this date
+    }
+
+    // 1.5 Collect all unique probable pitcher IDs from the fetched games
+    const pitcherIds = new Set<number>();
+    games.forEach(game => {
+      if (game.home_team_probable_pitcher_id) {
+        pitcherIds.add(game.home_team_probable_pitcher_id);
+      }
+      if (game.away_team_probable_pitcher_id) {
+        pitcherIds.add(game.away_team_probable_pitcher_id);
+      }
+    });
+
+    // Fetch pitcher details if there are any pitcher IDs
+    const pitcherDetailsMap = new Map<number, { name: string | null; hand: 'L' | 'R' | null }>();
+    if (pitcherIds.size > 0) {
+      log(`Fetching details for ${pitcherIds.size} unique probable pitcher IDs.`);
+      const { data: playersData, error: playersError } = await supabaseServer
+        .from('players') // Assuming your players table is named 'players'
+        .select('player_id, full_name, pitch_hand_code') // Use full_name and pitch_hand_code as per your players table
+        .in('player_id', Array.from(pitcherIds));
+
+      if (playersError) {
+        log(`Error fetching pitcher details: ${playersError.message}`);
+        // Continue without pitcher details, or handle error more strictly
+      } else if (playersData) {
+        (playersData as PitcherInfo[]).forEach(p => {
+          pitcherDetailsMap.set(p.player_id, {
+            name: p.full_name,
+            hand: p.pitch_hand_code
+          });
+        });
+        log(`Successfully fetched and mapped details for ${pitcherDetailsMap.size} pitchers.`);
+      }
     }
 
     // 2. Fetch all daily matchups for the given date
@@ -100,6 +142,10 @@ export default async function handler(
     // 3. Combine games with their respective matchups
     const GamesWithMatchupsAndVenues: GamesWithMatchupsAndVenues[] = games.map((game) => {
       log(`Processing game_pk: ${game.game_pk} (type: ${typeof game.game_pk})`);
+      
+      const homePitcherDetails = game.home_team_probable_pitcher_id ? pitcherDetailsMap.get(game.home_team_probable_pitcher_id) || null : null;
+      const awayPitcherDetails = game.away_team_probable_pitcher_id ? pitcherDetailsMap.get(game.away_team_probable_pitcher_id) || null : null;
+
       const gameSpecificMatchups = (allMatchupsForDate || []).filter(
         (matchup) => {
           // Both matchup.game_pk and game.game_pk should be numbers if from int8 columns
@@ -124,6 +170,8 @@ export default async function handler(
       return {
         ...game,
         venue: gameVenue,
+        home_pitcher_details: homePitcherDetails,
+        away_pitcher_details: awayPitcherDetails,
         matchups: gameSpecificMatchups,
       };
     });

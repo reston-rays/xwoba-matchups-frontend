@@ -1,4 +1,4 @@
-// scripts/compute-weighted-stats.ts
+// scripts/create-average-player-data.ts
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 import Papa from 'papaparse';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { PlayerSplit } from '../src/types/player.types'; // Adjust path if needed
+import { PlayerSplit } from '../src/types/database'; // Adjust path if needed
 
 // --- File Path Setup ---
 const __filename = fileURLToPath(import.meta.url);
@@ -23,9 +23,10 @@ const SUPABASE_TABLE_NAME = 'player_splits'; // Adjust if your table name is dif
 // Define season weights (e.g., 50% for 2025, 30% for 2024, 20% for 2023)
 // These are the 'recencyWeights' for the computeWeightedStats function.
 const SEASON_WEIGHTS: Record<number, number> = {
-  2025: 0.50,
+  2025: 0.40,
   2024: 0.30,
   2023: 0.20,
+  2022: 0.10,
   // Add more seasons and weights as needed. Ensure they sum to 1 if that's the assumption of your weighting logic.
   // The provided computeWeightedStats function normalizes by sum of (recencyWeight * pa),
   // so the sum of SEASON_WEIGHTS themselves doesn't strictly need to be 1, but it's a common convention.
@@ -33,26 +34,54 @@ const SEASON_WEIGHTS: Record<number, number> = {
 
 const SEASONS_TO_CONSIDER = Object.keys(SEASON_WEIGHTS).map(Number);
 
-// Interface for the data structure expected by computeWeightedStats
-interface SeasonStatInput {
-  season: number;
-  pa: number;
-  woba: number;
-  xwoba: number;
-  hardHitPct: number;   // expressed as 0–1 (e.g. 0.20 for 20%)
-  avg_launch_angle: number;
-  avg_exit_velocity: number;
-  barrels_per_pa: number;   // expressed as 0–1 (e.g. 0.05)
-}
+// Define the keys from PlayerSplit that are needed for weighted calculation
+type WeightedStatCalculationKeys =
+  | 'season'
+  | 'pa'
+  | 'obp'
+  | 'slg'
+  | 'woba'
+  | 'xwoba'
+  | 'xba'
+  | 'xobp'
+  | 'xslg'
+  | 'iso'
+  | 'babip'
+  | 'barrels'
+  | 'hard_hit_pct'
+  | 'avg_launch_angle'
+  | 'avg_exit_velocity'
+  | 'swing_miss_percent'
+  | 'hyper_speed'
+  | 'hrs'
+  | 'barrels_per_pa';
+
+// This type represents the data structure required by computeWeightedStats,
+// derived from PlayerSplit fields and ensuring they are non-nullable.
+// This effectively replaces the old SeasonStatInput interface.
+type SeasonStatInput = {
+  [K in WeightedStatCalculationKeys]: NonNullable<PlayerSplit[K]>;
+};
 
 // Interface for the output of computeWeightedStats
 interface ComputedWeightedStats {
+  weightedObp: number;
+  weightedSlg: number;
   weightedWoba: number;
   weightedXwoba: number;
+  weightedXba: number;
+  weightedXobp: number;
+  weightedXslg: number;
+  weightedIso: number;
+  weightedBabip: number;
+  weightedBarrels: number; // Weighted count
   weightedHardHitPct: number;
   weightedAvgLaunchAngle: number;
   weightedAvgExitVelocity: number;
+  weightedSwingMissPercent: number;
+  weightedHyperSpeed: number;
   weightedBarrelsPerPa: number;
+  weightedHrs: number; // Weighted count
   totalPA: number; // Adding this to capture sumWeight
 }
 
@@ -64,12 +93,23 @@ interface WeightedCsvRow {
   vs_handedness: 'L' | 'R';
   season: 0; // to represent weighted data
   season_descriptor: string;
+  weighted_obp: number | null;
+  weighted_slg: number | null;
   weighted_woba: number | null;
   weighted_xwoba: number | null;
+  weighted_xba: number | null;
+  weighted_xobp: number | null;
+  weighted_xslg: number | null;
+  weighted_iso: number | null;
+  weighted_babip: number | null;
+  weighted_barrels: number | null;
   weighted_hard_hit_pct: number | null;
   weighted_avg_launch_angle: number | null;
   weighted_avg_exit_velocity: number | null;
+  weighted_swing_miss_percent: number | null;
+  weighted_hyper_speed: number | null;
   weighted_barrels_per_pa: number | null;
+  weighted_hrs: number | null;
   total_pa: number | null;
   contributing_seasons: string; // e.g., "2024,2023"
   last_updated: string;
@@ -85,79 +125,96 @@ function computeWeightedStats(
   recencyWeights: Record<number, number>
 ): ComputedWeightedStats {
   let sumWeight = 0;
-  let sumW = 0;
-  let sumXw = 0;
-  let sumHH = 0;
-  let sumLaunch = 0;
-  let sumExit = 0;
-  let sumBarrelsPPA = 0;
   let sumPA = 0;
 
-  for (const { season, pa, woba, xwoba, hardHitPct, avg_launch_angle, avg_exit_velocity, barrels_per_pa } of data) {
-    const rw = recencyWeights[season] ?? 0;
-    const w = rw * pa;
+  let sumObp = 0;
+  let sumSlg = 0;
+  let sumWoba = 0;
+  let sumXwoba = 0;
+  let sumXba = 0;
+  let sumXobp = 0;
+  let sumXslg = 0;
+  let sumIso = 0;
+  let sumBabip = 0;
+  let sumBarrels = 0;
+  let sumHardHitPct = 0;
+  let sumAvgLaunchAngle = 0;
+  let sumAvgExitVelocity = 0;
+  let sumSwingMissPercent = 0;
+  let sumHyperSpeed = 0;
+  let sumBarrelsPPA = 0;
+  let sumHrs = 0;
+
+  for (const stat of data) {
+    const rw = recencyWeights[stat.season] ?? 0;
+    const w = rw * stat.pa;
     sumWeight += w;
-    sumW += w * woba;
-    sumXw += w * xwoba;
-    sumHH += w * hardHitPct;
-    sumLaunch += w * avg_launch_angle;
-    sumExit += w * avg_exit_velocity;
-    sumBarrelsPPA += w * barrels_per_pa;
-    sumPA += pa; // Total plate appearances for this player
+
+    sumObp += w * stat.obp;
+    sumSlg += w * stat.slg;
+    sumWoba += w * stat.woba;
+    sumXwoba += w * stat.xwoba;
+    sumXba += w * stat.xba;
+    sumXobp += w * stat.xobp;
+    sumXslg += w * stat.xslg;
+    sumIso += w * stat.iso;
+    sumBabip += w * stat.babip;
+    sumBarrels += w * stat.barrels;
+    sumHardHitPct += w * stat.hard_hit_pct;
+    sumAvgLaunchAngle += w * stat.avg_launch_angle;
+    sumAvgExitVelocity += w * stat.avg_exit_velocity;
+    sumSwingMissPercent += w * stat.swing_miss_percent;
+    sumHyperSpeed += w * stat.hyper_speed;
+    sumBarrelsPPA += w * stat.barrels_per_pa;
+    sumHrs += w * stat.hrs;
+
+    sumPA += stat.pa; // Total plate appearances for this player
   }
 
   if (sumWeight === 0) {
-    // Return an object with nulls or specific values indicating no valid data/weight
-    // This allows the calling function to handle it gracefully (e.g., by skipping the row or logging)
-    // instead of crashing the whole script.
     return {
-        weightedWoba: NaN, // Or null, depending on how you want to represent this in CSV
+        weightedObp: NaN,
+        weightedSlg: NaN,
+        weightedWoba: NaN,
         weightedXwoba: NaN,
+        weightedXba: NaN,
+        weightedXobp: NaN,
+        weightedXslg: NaN,
+        weightedIso: NaN,
+        weightedBabip: NaN,
+        weightedBarrels: NaN,
         weightedHardHitPct: NaN,
         weightedAvgLaunchAngle: NaN,
         weightedAvgExitVelocity: NaN,
+        weightedSwingMissPercent: NaN,
+        weightedHyperSpeed: NaN,
         weightedBarrelsPerPa: NaN,
+        weightedHrs: NaN,
         totalPA: 0,
     };
   }
 
   return {
-    weightedWoba: sumW / sumWeight,
-    weightedXwoba: sumXw / sumWeight,
-    weightedHardHitPct: sumHH / sumWeight,
-    weightedAvgLaunchAngle: sumLaunch / sumWeight,
-    weightedAvgExitVelocity: sumExit / sumWeight,
+    weightedWoba: sumWoba / sumWeight,
+    weightedXwoba: sumXwoba / sumWeight,
+    weightedObp: sumObp / sumWeight,
+    weightedSlg: sumSlg / sumWeight,
+    weightedXba: sumXba / sumWeight,
+    weightedXobp: sumXobp / sumWeight,
+    weightedXslg: sumXslg / sumWeight,
+    weightedIso: sumIso / sumWeight,
+    weightedBabip: sumBabip / sumWeight,
+    weightedBarrels: sumBarrels / sumWeight,
+    weightedHardHitPct: sumHardHitPct / sumWeight,
+    weightedAvgLaunchAngle: sumAvgLaunchAngle / sumWeight,
+    weightedAvgExitVelocity: sumAvgExitVelocity / sumWeight,
+    weightedSwingMissPercent: sumSwingMissPercent / sumWeight,
+    weightedHyperSpeed: sumHyperSpeed / sumWeight,
     weightedBarrelsPerPa: sumBarrelsPPA / sumWeight,
+    weightedHrs: sumHrs / sumWeight,
     totalPA: sumPA, // Total plate appearances across all seasons
   };
 }
-
-// ────────────────────────────────────────────────────────────────────────────────
-// Example usage on your sample player
-// ────────────────────────────────────────────────────────────────────────────────
-/*
-const seasons: SeasonStatInput[] = [
-  { season: 2025, pa: 100, woba: 0.300, xwoba: 0.325, hardHitPct: 0.20, avg_launch_angle: 10.0, avg_exit_velocity: 90, barrels_per_pa: 0.05 },
-  { season: 2024, pa: 300, woba: 0.290, xwoba: 0.300, hardHitPct: 0.185, avg_launch_angle: 12.5, avg_exit_velocity: 92, barrels_per_pa: 0.04 }, 
-  { season: 2023, pa: 350, woba: 0.320, xwoba: 0.310, hardHitPct: 0.19, avg_launch_angle: 15.0, avg_exit_velocity: 88, barrels_per_pa: 0.06 }
-];
-
-try {
-  const { weightedWoba, weightedXwoba, weightedHardHitPct, weightedAvgLaunchAngle, weightedAvgExitVelocity, weightedBarrelsPerPa, totalPA } = computeWeightedStats(seasons, SEASON_WEIGHTS);
-
-  console.log(`🔹 Weighted wOBA:      ${weightedWoba.toFixed(4)}`);
-  console.log(`🔹 Weighted xwOBA:     ${weightedXwoba.toFixed(4)}`);      // ~0.3093
-  console.log(`🔹 Weighted Hard Hit%: ${(weightedHardHitPct * 100).toFixed(2)}%`); // ~19.02%
-  console.log(`🔹 Weighted Launch Angle: ${(weightedAvgLaunchAngle).toFixed(2)}`);
-  console.log(`🔹 Weighted Exit Velocity: ${(weightedAvgExitVelocity).toFixed(2)}`); // ~90
-  console.log(`🔹 Weighted Barrels/PA: ${(weightedBarrelsPerPa).toFixed(2)}`); //
-  console.log(`🔹 Total PA: ${totalPA}`); // Total plate appearances across all seasons
-
-} catch (err) {
-  console.error(err);
-  process.exit(1);
-}
-*/
 
 function getSeasonDescriptor(): string {
   return "WEIGHTED_AVG_" + Object.entries(SEASON_WEIGHTS)
@@ -234,30 +291,52 @@ async function main() {
     const { player_id, player_type, vs_handedness } = splitsInGroup[0];
     const playerName = splitsInGroup.sort((a,b) => b.season - a.season).find(s => s.player_name)?.player_name || null;
 
-    const seasonStatsForCalc: SeasonStatInput[] = [];
+    const seasonStatsForCalc: SeasonStatInput[] = []; // Now uses the new SeasonStatInput type
     const contributingSeasonsSet = new Set<number>();
 
     for (const split of splitsInGroup) {
       if (
         typeof split.pa === 'number' && split.pa > 0 && // PA must be positive
         SEASON_WEIGHTS[split.season] !== undefined && // Season must have a weight defined
+        typeof split.obp === 'number' &&
+        typeof split.slg === 'number' &&
         typeof split.woba === 'number' &&
         typeof split.xwoba === 'number' &&
+        typeof split.xba === 'number' &&
+        typeof split.xobp === 'number' &&
+        typeof split.xslg === 'number' &&
+        typeof split.iso === 'number' &&
+        typeof split.babip === 'number' &&
+        typeof split.barrels === 'number' &&
         typeof split.hard_hit_pct === 'number' &&
         typeof split.avg_launch_angle === 'number' &&
         typeof split.avg_exit_velocity === 'number' &&
-        typeof split.barrels_per_pa === 'number'
+        typeof split.swing_miss_percent === 'number' &&
+        typeof split.hyper_speed === 'number' &&
+        typeof split.barrels_per_pa === 'number' &&
+        typeof split.hrs === 'number'
       ) {
         seasonStatsForCalc.push({
-          season: split.season,
-          pa: split.pa,
-          woba: split.woba,
-          xwoba: split.xwoba,
-          hardHitPct: split.hard_hit_pct, // DB stores as 0.xxxx
-          avg_launch_angle: split.avg_launch_angle,
-          avg_exit_velocity: split.avg_exit_velocity,
-          barrels_per_pa: split.barrels_per_pa, // DB stores as 0.xxxx
-        });
+          season: split.season, // Already number
+          pa: split.pa as number, // Known to be number due to typeof check
+          obp: split.obp as number,
+          slg: split.slg as number,
+          woba: split.woba as number, // Known to be number
+          xwoba: split.xwoba as number, // Known to be number
+          xba: split.xba as number,
+          xobp: split.xobp as number,
+          xslg: split.xslg as number,
+          iso: split.iso as number,
+          babip: split.babip as number,
+          barrels: split.barrels as number,
+          hard_hit_pct: split.hard_hit_pct as number, // Use PlayerSplit field name, known to be number
+          avg_launch_angle: split.avg_launch_angle as number, // Known to be number
+          avg_exit_velocity: split.avg_exit_velocity as number, // Known to be number
+          swing_miss_percent: split.swing_miss_percent as number,
+          hyper_speed: split.hyper_speed as number,
+          barrels_per_pa: split.barrels_per_pa as number, // Known to be number
+          hrs: split.hrs as number,
+        } as SeasonStatInput); // Assert as SeasonStatInput to satisfy TypeScript
         contributingSeasonsSet.add(split.season);
       }
     }
@@ -273,12 +352,23 @@ async function main() {
           vs_handedness,
           season: 0, // This is a weighted average, so we use 0 to indicate that
           season_descriptor: seasonDescriptor,
+          weighted_obp: computed.weightedObp,
+          weighted_slg: computed.weightedSlg,
           weighted_woba: computed.weightedWoba,
           weighted_xwoba: computed.weightedXwoba,
+          weighted_xba: computed.weightedXba,
+          weighted_xobp: computed.weightedXobp,
+          weighted_xslg: computed.weightedXslg,
+          weighted_iso: computed.weightedIso,
+          weighted_babip: computed.weightedBabip,
+          weighted_barrels: computed.weightedBarrels,
           weighted_hard_hit_pct: computed.weightedHardHitPct,
           weighted_avg_launch_angle: computed.weightedAvgLaunchAngle,
           weighted_avg_exit_velocity: computed.weightedAvgExitVelocity,
+          weighted_swing_miss_percent: computed.weightedSwingMissPercent,
+          weighted_hyper_speed: computed.weightedHyperSpeed,
           weighted_barrels_per_pa: computed.weightedBarrelsPerPa,
+          weighted_hrs: computed.weightedHrs,
           total_pa: computed.totalPA,
           contributing_seasons: Array.from(contributingSeasonsSet).sort((a,b) => b-a).join(','),
           last_updated: new Date().toISOString(),

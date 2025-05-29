@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/page.tsx
 'use client';
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, FC } from 'react';
 
-import { Matchup } from '@/types/player.types';
-import { Venue } from '@/types/database';
+import { Matchup, Venue } from '@/types/database';
 import { GamesWithMatchupsAndVenues } from '@/pages/api/matchups'; // Import the new type
 
 type GameDisplayData = {
@@ -36,10 +35,11 @@ export default function HomePage() {
   const [displayLimit, setDisplayLimit] = useState<number>(20); // Default to 20
   const [refreshError, setRefreshError] = useState<string | null>(null); // Separate error state for refresh
   const [isRefreshingGames, setIsRefreshingGames] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Unified loading state
 
   const fetchMatchups = useCallback(async () => {
       setError(null);
-      setAllGamesWithMatchups(null); // Reset state for new fetch
+      setIsLoading(true);
       try {
         const res = await fetch(`/api/matchups?date=${selectedDate}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -49,6 +49,8 @@ export default function HomePage() {
         console.error('Error loading matchups:', err);
         setError(err.message ?? 'Unknown error');
         setAllGamesWithMatchups([]); // Set to empty array on error to stop loading state
+      } finally {
+        setIsLoading(false);
       }
   }, [selectedDate]);
 
@@ -128,31 +130,17 @@ export default function HomePage() {
       const gameTime = game.game_datetime_utc || null;
       const detailedState = game.detailed_state || null;
 
-      // Pitcher for the Home Team (will be faced by Away Team batters)
-      const homeTeamsActualPitcherId = game.home_team_probable_pitcher_id;
-      let homeTeamsActualPitcherName: string | null | undefined = null;
-      let homeTeamsActualPitcherHand: 'L' | 'R' | null | undefined = null;
+      // Get pitcher details directly from the game object (populated by the API)
+      // Home team's pitcher (faces away batters)
+      const homeTeamsActualPitcherName = (game as any).home_pitcher_details?.name || null;
+      const homeTeamsActualPitcherHand = (game as any).home_pitcher_details?.hand || null;
 
-      // Pitcher for the Away Team (will be faced by Home Team batters)
-      const awayTeamsActualPitcherId = game.away_team_probable_pitcher_id;
-      let awayTeamsActualPitcherName: string | null | undefined = null;
-      let awayTeamsActualPitcherHand: 'L' | 'R' | null | undefined = null;
+      // Away team's pitcher (faces home batters)
+      const awayTeamsActualPitcherName = (game as any).away_pitcher_details?.name || null;
+      const awayTeamsActualPitcherHand = (game as any).away_pitcher_details?.hand || null;
 
-      // Find pitcher details from the matchups array using the IDs
-      if (homeTeamsActualPitcherId && game.matchups?.length > 0) {
-        const homePitcherMatchup = game.matchups.find(m => m.pitcher_id === homeTeamsActualPitcherId);
-        if (homePitcherMatchup) {
-          homeTeamsActualPitcherName = homePitcherMatchup.pitcher_name;
-          homeTeamsActualPitcherHand = homePitcherMatchup.pitcher_hand as 'L' | 'R' | null | undefined;
-        }
-      }
-      if (awayTeamsActualPitcherId && game.matchups?.length > 0) {
-        const awayPitcherMatchup = game.matchups.find(m => m.pitcher_id === awayTeamsActualPitcherId);
-        if (awayPitcherMatchup) {
-          awayTeamsActualPitcherName = awayPitcherMatchup.pitcher_name;
-          awayTeamsActualPitcherHand = awayPitcherMatchup.pitcher_hand as 'L' | 'R' | null | undefined;
-        }
-      }
+      const homeTeamsActualPitcherId = game.home_team_probable_pitcher_id; // Still needed for filtering matchups
+      const awayTeamsActualPitcherId = game.away_team_probable_pitcher_id; // Still needed for filtering matchups
 
       const homeTeamMatchups: Matchup[] = [];
       const awayTeamMatchups: Matchup[] = [];
@@ -312,9 +300,9 @@ export default function HomePage() {
       )}
 
       {/* Loading state */}
-      {allGamesWithMatchups === null && !error ? ( // Check allGamesWithMatchups for initial load
+      {isLoading ? (
         <div>Loading…</div>
-      ) : allGamesWithMatchups && allGamesWithMatchups.length === 0 && !error ? ( // Added check for allGamesWithMatchups being defined
+      ) : allGamesWithMatchups && allGamesWithMatchups.length === 0 && !error ? (
         <div>No matchups found for {selectedDate}.</div>
       ) : (
         <>
@@ -349,7 +337,7 @@ export default function HomePage() {
                   <div className="flex flex-col md:flex-row md:space-x-6">
                     <div className="flex-1 mb-6 md:mb-0">
                       <MatchupTable
-                        title={`${game.awayTeamAbbr || 'Away'} Batting Lineup vs. ${
+                        title={`${game.awayTeamAbbr || 'Away'} Batting Lineup vs. ${ // Away batters face Home pitcher
                           game.homeTeamProbablePitcherName || 'Pitcher'
                         }${
                           game.homeTeamProbablePitcherHand ? ` (${game.homeTeamProbablePitcherHand})` : ''
@@ -360,7 +348,7 @@ export default function HomePage() {
                     </div>
                     <div className="flex-1">
                       <MatchupTable
-                        title={`${game.homeTeamAbbr || 'Home'} Batting Lineup vs. ${
+                        title={`${game.homeTeamAbbr || 'Home'} Batting Lineup vs. ${ // Home batters face Away pitcher
                           game.awayTeamProbablePitcherName || 'Pitcher'
                         }${
                           game.awayTeamProbablePitcherHand ? ` (${game.awayTeamProbablePitcherHand})` : ''

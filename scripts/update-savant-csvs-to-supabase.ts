@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Papa from 'papaparse';
+import { PlayerSplit } from '../src/types/database'; // Import the PlayerSplit type
 
 /**
  * @file upload-savant-csvs-to-supabase.ts
@@ -78,13 +79,13 @@ function parseIntOrNull(value: string | undefined | null): number | null {
   return isNaN(num) ? null : num;
 }
 
-function extractInfoFromFilename(filename: string): { season: number; playerType: string; opponentHand: string } | null {
+function extractInfoFromFilename(filename: string): { season: number; playerType: 'batter' | 'pitcher'; opponentHand: 'L' | 'R' } | null {
   const match = filename.match(/savant_stats_(\d{4})_(batter|pitcher)_vs_([RL])H\.csv/);
   if (match) {
     return {
       season: parseInt(match[1], 10),
-      playerType: match[2],
-      opponentHand: match[3],
+      playerType: match[2] as 'batter' | 'pitcher',
+      opponentHand: match[3] as 'L' | 'R',
     };
   }
   return null;
@@ -133,12 +134,12 @@ async function processAndUploadSavantCsvs(): Promise<void> {
           continue;
         }
 
-        const recordsToUpsert = parseResult.data.map((row: any) => ({
+        const recordsToUpsert: PlayerSplit[] = parseResult.data.map((row: any): PlayerSplit => ({
           // Identifiers
-          player_id: parseIntOrNull(row.player_id),
+          player_id: parseIntOrNull(row.player_id) as number, // Assert as number; filter will remove nulls
           season: season,
-          player_type: playerType,
-          vs_handedness: opponentHand,
+          player_type: playerType, // Already typed from extractInfoFromFilename
+          vs_handedness: opponentHand, // Already typed from extractInfoFromFilename
           player_name: row['last_name, first_name'] || row.player_name || null,
 
           // Core Plate Appearance Stats
@@ -170,9 +171,15 @@ async function processAndUploadSavantCsvs(): Promise<void> {
           avg_exit_velocity: parseFloatAndRound(row.launch_speed, 2),      // Renamed DB field (was avg_launch_speed), CSV: launch_speed
           max_exit_velocity: parseFloatAndRound(row.max_launch_speed, 2),  // New DB field, CSV: max_launch_speed
           avg_launch_angle: parseFloatAndRound(row.launch_angle, 2),       // DB field: avg_launch_angle, CSV: launch_angle
+          hrs: parseIntOrNull(row.hrs),                                    // DB field: hrs, CSV: hrs
+          swing_miss_percent: parseFloatAndRound(row.swing_miss_percent, 4, true), // CSV: swing_miss_percent, DB: numeric(5,4)
+          hyper_speed: parseFloatAndRound(row.hyper_speed, 1),                   // CSV: hyper_speed, DB: numeric(4,1)
 
           last_updated: new Date().toISOString(), // Set last_updated to current time
-        })).filter(record => record.player_id !== null && record.season !== null);
+        })).filter((record): record is PlayerSplit => // Type guard to ensure non-null PK fields
+          record.player_id !== null &&
+          record.season !== null // player_type and vs_handedness are guaranteed by fileInfo
+        );
 
         if (recordsToUpsert.length > 0) {
           console.log(`  ⏳ Upserting ${recordsToUpsert.length} records from ${csvFile} to Supabase table "${SUPABASE_TABLE_NAME}"...`);
@@ -230,40 +237,45 @@ async function processAndUploadWeightedStats(): Promise<void> {
       return;
     }
 
-    const recordsToUpsert = parseResult.data.map((row: any) => ({
-      player_id: parseIntOrNull(row.player_id),
-      season: parseIntOrNull(row.season), // Should be 0
-      player_type: row.player_type || null,
-      vs_handedness: row.vs_handedness || null,
+    const recordsToUpsert: PlayerSplit[] = parseResult.data.map((row: any): PlayerSplit => ({
+      player_id: parseIntOrNull(row.player_id) as number, // Assuming player_id is non-null after filter
+      season: parseIntOrNull(row.season) as number, // Should be 0, assuming non-null after filter
+      player_type: row.player_type as 'batter' | 'pitcher', // Asserting type from CSV
+      vs_handedness: row.vs_handedness as 'L' | 'R', // Asserting type from CSV
       player_name: row.player_name || null,
-
       pa: parseIntOrNull(row.total_pa), // from weighted_player_stats.csv
       ab: null, // Not in weighted_player_stats.csv
-      ba: null,
-      obp: null,
-      slg: null,
+      ba: null, // Not directly calculated as weighted_ba, but could be derived if needed. For now, null.
+      obp: parseFloatOrNull(row.weighted_obp),
+      slg: parseFloatOrNull(row.weighted_slg),
       woba: parseFloatOrNull(row.weighted_woba),
       xwoba: parseFloatOrNull(row.weighted_xwoba),
-      xba: null,
-      xobp: null,
-      xslg: null,
-      iso: null,
-      babip: null,
-      barrels: null, // Not in weighted_player_stats.csv
+      xba: parseFloatOrNull(row.weighted_xba),
+      xobp: parseFloatOrNull(row.weighted_xobp),
+      xslg: parseFloatOrNull(row.weighted_xslg),
+      iso: parseFloatOrNull(row.weighted_iso),
+      babip: parseFloatOrNull(row.weighted_babip),
+      barrels: parseIntOrNull(row.weighted_barrels), // Weighted count, maps to integer 'barrels'
       barrels_per_pa: parseFloatOrNull(row.weighted_barrels_per_pa),
       hard_hit_pct: parseFloatOrNull(row.weighted_hard_hit_pct),
       avg_exit_velocity: parseFloatOrNull(row.weighted_avg_exit_velocity),
       max_exit_velocity: null, // Not in weighted_player_stats.csv
       avg_launch_angle: parseFloatOrNull(row.weighted_avg_launch_angle),
+      hrs: parseIntOrNull(row.weighted_hrs), // Weighted count, maps to integer 'hrs'
+      swing_miss_percent: parseFloatOrNull(row.weighted_swing_miss_percent),
+      hyper_speed: parseFloatOrNull(row.weighted_hyper_speed),
+
+      // These are not typically part of weighted averages in this context
       groundball_pct: null, // Not in weighted_player_stats.csv
       line_drive_pct: null,
       flyball_pct: null,
+
       last_updated: new Date().toISOString(),
-    })).filter(record =>
+    })).filter((record): record is PlayerSplit => // Type guard for weighted stats
       record.player_id !== null &&
       record.season === 0 && // Ensure we are only processing season 0 records
-      record.player_type &&
-      record.vs_handedness
+      (record.player_type === 'batter' || record.player_type === 'pitcher') &&
+      (record.vs_handedness === 'L' || record.vs_handedness === 'R')
     );
 
     if (recordsToUpsert.length > 0) {

@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Team, Venue } from '../src/types/database'; // Assuming your types are in src/types/database.ts
+import { Team, Venue, Player } from '../src/types/database'; // Assuming your types are in src/types/database.ts
 
 // --- Configuration ---
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -16,6 +16,7 @@ const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROL
 console.log('Supabase client initialized.');
 
 const MLB_API_BASE_URL = 'https://statsapi.mlb.com/api/v1';
+const API_CALL_DELAY_MS = 2000; // 2 second delay between roster fetches
 
 /**
  * Fetches all MLB teams (sportId=1).
@@ -194,9 +195,97 @@ async function populateVenuesTable() {
   }
 }
 
+/**
+ * Fetches roster for a given teamId and extracts player data.
+ * API Endpoint: https://statsapi.mlb.com/api/v1/teams/{teamId}/roster?hydrate=person
+ */
+async function fetchRosterForTeam(teamId: number): Promise<any[]> {
+  const url = `${MLB_API_BASE_URL}/teams/${teamId}/roster?hydrate=person`;
+  console.log(`Fetching roster for team ID ${teamId} from: ${url}`);
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status} - ${await response.text()}`);
+    }
+    const data = await response.json();
+    if (!data.roster || !Array.isArray(data.roster)) {
+      console.warn(`Unexpected API response structure for team ${teamId} roster, or roster is empty:`, data);
+      return []; // Return empty array if roster is not found or not an array
+    }
+    return data.roster;
+  } catch (error) {
+    console.error(`Failed to fetch roster for team ID ${teamId}:`, error);
+    return []; // Return empty on error to not break the main loop
+  }
+}
+
+/**
+ * Populates the 'players' table in Supabase with MLB player data from team rosters.
+ */
+async function populatePlayersTable() {
+  try {
+    const apiTeams = await fetchAllMLBTeams();
+    if (!apiTeams.length) {
+      console.log('No teams fetched, so cannot fetch rosters. Exiting player population.');
+      return;
+    }
+
+    const allPlayersMap = new Map<number, Omit<Player, 'created_at' | 'updated_at'>>();
+
+    console.log(`Fetching rosters for ${apiTeams.length} teams...`);
+    for (const apiTeam of apiTeams) {
+      if (!apiTeam.id) continue;
+
+      const roster = await fetchRosterForTeam(apiTeam.id);
+      roster.forEach((rosterEntry: any) => {
+        const person = rosterEntry.person;
+        if (person && person.id && !allPlayersMap.has(person.id)) {
+          allPlayersMap.set(person.id, {
+            player_id: person.id,
+            full_name: person.fullName,
+            current_age: person.currentAge || null,
+            height: person.height || null,
+            weight: person.weight || null,
+            primary_position_name: person.primaryPosition?.name || null,
+            primary_position_abbreviation: person.primaryPosition?.abbreviation || null,
+            bat_side_code: person.batSide?.code || null,
+            pitch_hand_code: person.pitchHand?.code || null,
+          });
+        }
+      });
+
+      // Delay to avoid overwhelming the API
+      await new Promise(resolve => setTimeout(resolve, API_CALL_DELAY_MS));
+    }
+
+    const playersToInsert = Array.from(allPlayersMap.values());
+
+    if (playersToInsert.length === 0) {
+      console.log('No new player data to insert. Exiting player population.');
+      return;
+    }
+
+    console.log(`Attempting to upsert ${playersToInsert.length} players into Supabase...`);
+    const { data, error } = await supabase
+      .from('players')
+      .upsert(playersToInsert, { onConflict: 'player_id' }) as { data: Player[] | null, error: any };
+
+    if (error) {
+      console.error('Error upserting players into Supabase:', error);
+      throw error;
+    }
+
+    console.log('Successfully populated players table.', data?.length || 0, 'records affected.');
+  } catch (error) {
+    console.error('An error occurred during the players population process:', error);
+    process.exit(1);
+  }
+}
+
 // Main execution
 (async () => {
   await populateVenuesTable(); // Populate venues FIRST
   await populateTeamsTable();
+  await populatePlayersTable(); // Populate players after teams
   console.log('Static data population script finished.');
 })();

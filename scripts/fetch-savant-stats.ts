@@ -23,7 +23,7 @@ import { fileURLToPath } from 'url';
 const BASE_SAVANT_URL = 'https://baseballsavant.mlb.com/statcast_search/csv';
 
 // Define the seasons you want to generate URLs for
-const TARGET_SEASONS: number[] = [2023, 2024, 2025];
+const TARGET_SEASONS: number[] = [2022, 2023, 2024, 2025];
 
 // Define player types
 const PLAYER_TYPES: ('batter' | 'pitcher')[] = ['batter', 'pitcher'];
@@ -67,12 +67,13 @@ const COMMON_PARAMS: Record<string, string> = {
   group_by: 'name', // Group results by player name
   min_pitches: '0', // Minimum pitches thrown (more relevant for pitchers if not grouping by PA)
   min_results: '0', // Minimum batted ball results
-  min_pas: '20', // Minimum Plate Appearances to qualify
+  min_pas: '5', // Minimum Plate Appearances to qualify
   sort_col: 'xwoba', // Primary sort column
   player_event_sort: 'api_p_release_speed', // Default secondary sort from UI, may not be impactful with group_by=name
   sort_order: 'desc', // Sort order: descending
   // Checkboxes for stats to include in the CSV output:
   chk_stats_pa: 'on',
+  chk_stats_hrs: 'on', // Home Runs
   chk_stats_k_percent: 'on',
   chk_stats_bb_percent: 'on',
   chk_stats_ba: 'on',
@@ -81,7 +82,10 @@ const COMMON_PARAMS: Record<string, string> = {
   chk_stats_woba: 'on',
   chk_stats_xwoba: 'on',
   chk_stats_barrels_total: 'on', // Total Barrels
+  chk_stats_iso: 'on', // Isolated Power
+  chk_stats_swing_miss_percent: 'on', // Swing and Miss Percentage
   chk_stats_launch_speed: 'on', // Average Exit Velocity
+  chk_stats_hyper_speed: 'on', // Adjusted Exit Velocity (Hyper Speed)
   chk_stats_launch_angle: 'on', // Average Launch Angle
   chk_stats_hardhit_percent: 'on', // Hard Hit Percentage
   chk_stats_barrels_per_pa_percent: 'on', // Barrels per Plate Appearance Percentage
@@ -94,7 +98,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SAVANT_CSV_OUTPUT_DIR = path.join(__dirname, 'savant_csv_output'); // Output directory for downloaded CSVs
 
-const DOWNLOAD_DELAY_MS = 30000; // 30 seconds delay between downloads
+const DOWNLOAD_DELAY_MS = 15000; // 15 seconds delay between downloads
 
 // --- Function to Construct URLs and Download CSVs ---
 
