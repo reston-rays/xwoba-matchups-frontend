@@ -34,6 +34,20 @@ export default function HomePage() {
     }
   }, [date]);
 
+  const handleDateChange = (offset: number) => {
+    const currentDate = new Date(date + 'T00:00:00'); // Ensure parsing as local date
+    currentDate.setDate(currentDate.getDate() + offset);
+    setDate(currentDate.toISOString().slice(0, 10));
+  };
+
+  const handlePrevDay = () => {
+    handleDateChange(-1);
+  };
+
+  const handleNextDay = () => {
+    handleDateChange(1);
+  };
+
   useEffect(() => {
     fetchGames();
   }, [fetchGames]);
@@ -74,14 +88,25 @@ export default function HomePage() {
       <h1 className="text-2xl font-bold mb-4">xwOBA Matchups</h1>
 
       {/* Date Picker */}
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-2">
+        <button
+          onClick={handlePrevDay}
+          className="px-3 py-1 border border-gray-600 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded"
+        >
+          &lt;
+        </button>
         <input
           type="date"
           value={date}
-          max={new Date().toISOString().slice(0, 10)}
           onChange={e => setDate(e.target.value)}
           className="border border-gray-600 bg-gray-800 text-gray-200 px-2 py-1 rounded"
         />
+        <button
+          onClick={handleNextDay}
+          className="px-3 py-1 border border-gray-600 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded"
+        >
+          &gt;
+        </button>
       </div>
 
       {/* Top Overall */}

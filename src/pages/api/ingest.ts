@@ -147,8 +147,9 @@ export default async function handler(
     for (const g of games) {
       const homeStarter = await getStarter(g, 'home');
       const awayStarter = await getStarter(g, 'away');
-      if (!homeStarter || !awayStarter) {
-        log(`⏭️ Skipping game ${g.gamePk}`);
+
+      if (!homeStarter && !awayStarter) {
+        log(`⏭️ Skipping game ${g.gamePk} - NEITHER probable pitcher is known.`);
         continue;
       }
 
@@ -234,10 +235,20 @@ export default async function handler(
         });
       };
 
-      processTeamLineup('home', awayStarter, g, gameHomeTeamId, gameAwayTeamId, actualGameHomeAbbr, actualGameAwayAbbr);
-      processTeamLineup('away', homeStarter, g, gameHomeTeamId, gameAwayTeamId, actualGameHomeAbbr, actualGameAwayAbbr);
+      // Process home team batting against away starter, if away starter is known
+      if (awayStarter) {
+        processTeamLineup('home', awayStarter, g, gameHomeTeamId, gameAwayTeamId, actualGameHomeAbbr, actualGameAwayAbbr);
+      } else {
+        log(`ℹ️ No away starter for game ${g.gamePk}. Skipping home team batting matchups.`);
+      }
 
-      log(`🔍 Processed game ${g.gamePk}: ${lookupPairs.length} matchups found`);
+      // Process away team batting against home starter, if home starter is known
+      if (homeStarter) {
+        processTeamLineup('away', homeStarter, g, gameHomeTeamId, gameAwayTeamId, actualGameHomeAbbr, actualGameAwayAbbr);
+      } else {
+        log(`ℹ️ No home starter for game ${g.gamePk}. Skipping away team batting matchups.`);
+      }
+      log(`🔍 Finished processing game ${g.gamePk}. Current lookupPairs count: ${lookupPairs.length} (may be one-sided if a pitcher is unknown).`);
     }
 
     const uniquePlayerIds = Array.from(playerIds);
