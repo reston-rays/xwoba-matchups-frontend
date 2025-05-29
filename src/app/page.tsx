@@ -67,7 +67,7 @@ export default function HomePage() {
         try {
           const errorData = await res.json();
           errorDetail = errorData.error || errorData.message || errorDetail;
-        } catch () { /* Ignore if response is not JSON */ }
+        } catch { /* Ignore if response is not JSON */ }
         throw new Error(errorDetail);
       }
       console.log('/api/add-games called successfully. Game data refresh initiated.');
