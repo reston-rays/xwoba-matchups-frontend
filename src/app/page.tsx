@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Matchup, Venue } from '@/types/database';
+import { Matchup } from '@/types/database';
 import { GamesWithMatchupsAndVenues } from '@/pages/api/matchups';
 
 export default function HomePage() {
@@ -26,8 +26,14 @@ export default function HomePage() {
       const res = await fetch(`/api/matchups?date=${date}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setGames(await res.json());
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      let errorMessage = 'An unknown error occurred while fetching games.';
+      if (e instanceof Error) {
+        errorMessage = e.message;
+      } else if (typeof e === 'string') {
+        errorMessage = e;
+      }
+      setError(errorMessage);
       setGames([]);
     } finally {
       setLoading(false);

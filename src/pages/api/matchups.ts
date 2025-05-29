@@ -87,7 +87,7 @@ export default async function handler(
       if (g.away_team_probable_pitcher_id) pitcherIds.add(g.away_team_probable_pitcher_id);
     });
 
-    type PitcherInfo = { player_id: number; full_name: string; pitch_hand_code: 'L' | 'R' | null };
+    // type PitcherInfo = { player_id: number; full_name: string; pitch_hand_code: 'L' | 'R' | null };
     const pitcherDetailsMap = new Map<number, { name: string | null; hand: 'L' | 'R' | null }>();
     if (pitcherIds.size) {
       const { data: playersData } = await supabaseServer
