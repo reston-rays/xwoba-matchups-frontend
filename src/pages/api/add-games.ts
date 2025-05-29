@@ -3,7 +3,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseServer } from '@/lib/supabaseServerClient';
 
-import { Game } from '@/types/database'; // Import the Game interface
+import { Database } from '@/types/database.types';
+type Game = Database['public']['Tables']['games']['Row'];
 
 // Re-using the fetchWithRetry utility from ingest.ts
 const fetchWithRetry = async (url: string, retries = 3): Promise<any> => {

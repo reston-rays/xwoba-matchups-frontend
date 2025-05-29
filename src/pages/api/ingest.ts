@@ -267,7 +267,7 @@ export default async function handler(
         
         const { data: batchData, error: batchError } = await supabaseServer
           .from('player_splits')
-          .select('player_id, season, player_type,vs_handedness,xwoba,avg_launch_angle,barrels_per_pa,hard_hit_pct,avg_exit_velocity,k_percent,bb_percent,iso,swing_miss_percent')
+          .select('player_id, season, player_type, vs_handedness, xwoba, avg_launch_angle, barrels_per_pa, hard_hit_pct, avg_exit_velocity, k_percent, bb_percent, iso, swing_miss_percent, hrs, pa')
           .eq('season', 0)
           .in('player_id', playerIdsBatch) // Fetch all season 0 splits for players in the batch
           .limit(playerIdsBatch.length * 6); // Increased limit: assuming max ~6 relevant splits (e.g., B/P vs L/R/S) per player for season 0
@@ -286,7 +286,6 @@ export default async function handler(
       log('⚠️ No unique player IDs found, skipping player_splits fetch.');
     }
     
-
     // 6. Batch-fetch handedness
     const batMap = new Map<number, string>();
     const pitMap = new Map<number, string>();
@@ -357,7 +356,10 @@ export default async function handler(
         pitcherSplitData.k_percent != null && batterSplitData.k_percent != null &&
         pitcherSplitData.bb_percent != null && batterSplitData.bb_percent != null &&
         pitcherSplitData.iso != null && batterSplitData.iso != null &&
-        pitcherSplitData.swing_miss_percent != null && batterSplitData.swing_miss_percent != null
+        pitcherSplitData.swing_miss_percent != null && batterSplitData.swing_miss_percent != null &&
+        pitcherSplitData.hrs != null && batterSplitData.hrs != null &&
+        pitcherSplitData.pa != null && batterSplitData.pa != null &&
+        pitcherSplitData.pa > 0 && batterSplitData.pa > 0
       ) {
         // All conditions met, add to upserts
         acc.push({
@@ -386,6 +388,8 @@ export default async function handler(
           avg_bb_percent: (pitcherSplitData.bb_percent + batterSplitData.bb_percent) / 2,
           avg_iso: (pitcherSplitData.iso + batterSplitData.iso) / 2,
           avg_swing_miss_percent: (pitcherSplitData.swing_miss_percent + batterSplitData.swing_miss_percent) / 2,
+          avg_hr_per_pa: ((pitcherSplitData.hrs / pitcherSplitData.pa) + 
+                         (batterSplitData.hrs / batterSplitData.pa)) / 2,
         });
       } else {
         // Determine the exact reason for skipping
@@ -401,6 +405,7 @@ export default async function handler(
           if (pitcherSplitData.bb_percent == null) detailedSkipReason += `Pitcher bb_percent is null. `;
           if (pitcherSplitData.iso == null) detailedSkipReason += `Pitcher iso is null. `;
           if (pitcherSplitData.swing_miss_percent == null) detailedSkipReason += `Pitcher swing_miss_percent is null. `;
+          if (pitcherSplitData.hr_per_pa == null) detailedSkipReason += `Pitcher hr_per_pa is null. `;
         }
         if (!batterSplitData) {
           detailedSkipReason += `Batter split data not found (Criteria: BatID:${bat}, Type:batter, VsHand:${pitSide}, Season:0). `;
@@ -411,6 +416,7 @@ export default async function handler(
           if (batterSplitData.bb_percent == null) detailedSkipReason += `Batter bb_percent is null. `;
           if (batterSplitData.iso == null) detailedSkipReason += `Batter iso is null. `;
           if (batterSplitData.swing_miss_percent == null) detailedSkipReason += `Batter swing_miss_percent is null. `;
+          if (batterSplitData.hr_per_pa == null) detailedSkipReason += `Batter hr_per_pa is null. `;
         }
         log(`⚠️ Skipping matchup Bat:${bat}(${batName}) vs Pit:${pit}(${pitName}). Reason(s): ${detailedSkipReason || "One or more required player_split stats are null or records not found."}`);
       }

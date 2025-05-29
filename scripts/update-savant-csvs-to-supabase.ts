@@ -5,7 +5,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Papa from 'papaparse';
-import { PlayerSplit } from '../src/types/database'; // Import the PlayerSplit type
+
+import { Database } from '../src/types/database.types';
+type PlayerSplit = Database['public']['Tables']['player_splits']['Row'];
 
 /**
  * @file upload-savant-csvs-to-supabase.ts

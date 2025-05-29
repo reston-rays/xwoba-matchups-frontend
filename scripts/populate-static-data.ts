@@ -1,5 +1,13 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Team, Venue, Player } from '../src/types/database'; // Assuming your types are in src/types/database.ts
+import type { Database } from '../src/types/database.types';
+
+// Then you can use it as:
+type Player = Database['public']['Tables']['players']['Row'];
+type Team = Database['public']['Tables']['teams']['Row'];
+type Venue = Database['public']['Tables']['venues']['Row']; 
+
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
 // --- Configuration ---
 const SUPABASE_URL = process.env.SUPABASE_URL;

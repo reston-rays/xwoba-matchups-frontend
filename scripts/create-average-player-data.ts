@@ -6,7 +6,9 @@ import fs from 'fs/promises';
 import Papa from 'papaparse';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { PlayerSplit } from '../src/types/database'; // Adjust path if needed
+
+import { Database } from '../src/types/database.types';
+type PlayerSplit = Database['public']['Tables']['player_splits']['Row'];
 
 // --- File Path Setup ---
 const __filename = fileURLToPath(import.meta.url);

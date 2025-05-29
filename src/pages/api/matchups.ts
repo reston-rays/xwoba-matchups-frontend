@@ -3,7 +3,11 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseServer } from '@/lib/supabaseServerClient';
-import { Game, Matchup, Venue } from '@/types/database';  // :contentReference[oaicite:1]{index=1} :contentReference[oaicite:3]{index=3}
+
+import { Database } from '@/types/database.types';
+type Game = Database['public']['Tables']['games']['Row'];
+type Matchup = Database['public']['Tables']['daily_matchups']['Row'];
+type Venue = Database['public']['Tables']['venues']['Row'];
 
 export interface GamesWithMatchupsAndVenues extends Game {
   venue?: Venue;

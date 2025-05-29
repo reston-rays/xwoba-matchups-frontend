@@ -2,7 +2,9 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Matchup } from '@/types/database';
+import { Database } from '@/types/database.types';
+type Matchup = Database['public']['Tables']['daily_matchups']['Row'];
+
 import { GamesWithMatchupsAndVenues } from '@/pages/api/matchups';
 
 export default function HomePage() {
@@ -83,8 +85,8 @@ export default function HomePage() {
       homeAbbr = firstMatchup.game_home_team_abbreviation;
     }
 
-    const awayDisplay = awayAbbr || game.away_team_id.toString();
-    const homeDisplay = homeAbbr || game.home_team_id.toString();
+    const awayDisplay = awayAbbr || (game.away_team_id ? game.away_team_id.toString() : 'TBD');
+    const homeDisplay = homeAbbr || (game.home_team_id ? game.home_team_id.toString() : 'TBD');
 
     return `${awayDisplay} @ ${homeDisplay}`;
   }, []); // Empty dependency array as the function's logic only depends on the 'game' argument structure.
@@ -238,7 +240,7 @@ const getKPercentColor = (kPercent: number): string => {
   if (kPercent >= 0.300) return 'text-red-400 font-semibold'; // Very High (bad)
   if (kPercent >= 0.250) return 'text-yellow-400'; // High
   if (kPercent >= 0.180) return 'text-green-400'; // Average/Good
-  return 'text-blue-400'; // Low (excellent)
+  return 'text-blue-400 font-semibold'; // Low (excellent)
 };
 
 const getBBPercentColor = (bbPercent: number): string => {
@@ -246,6 +248,14 @@ const getBBPercentColor = (bbPercent: number): string => {
   if (bbPercent >= 0.120) return 'text-blue-400 font-semibold'; // Excellent
   if (bbPercent >= 0.090) return 'text-green-400'; // Good
   if (bbPercent >= 0.060) return 'text-yellow-400'; // Average
+  return 'text-red-400'; // Poor
+};
+
+const getWhiffPercentColor = (whiffPercent: number): string => {
+  // Lower Whiff% is better for batters
+  if (whiffPercent <= 0.20) return 'text-blue-400 font-semibold'; // Excellent
+  if (whiffPercent <= 0.25) return 'text-green-400'; // Good
+  if (whiffPercent <= 0.30) return 'text-yellow-400'; // Average
   return 'text-red-400'; // Poor
 };
 
@@ -261,11 +271,13 @@ function MatchupTable({ matchups, isGameSpecific }: TableProps) {
           {!isGameSpecific && <th className="px-2 py-2 text-left border-b border-gray-600">#</th>}
           <th className="px-2 py-2 text-left border-b border-gray-600">Batter</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">xwOBA</th>
+          <th className="px-2 py-2 text-right border-b border-gray-600">HR/PA</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">LA</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">Brls/PA</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">Hard%</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">K%</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">BB%</th>
+          <th className="px-2 py-2 text-right border-b border-gray-600">Whiff%</th>
           <th className="px-2 py-2 text-right border-b border-gray-600">EV</th>
         </tr>
       </thead>
@@ -286,23 +298,29 @@ function MatchupTable({ matchups, isGameSpecific }: TableProps) {
             <td className={`px-2 py-2 text-right ${getXwobaColor(m.avg_xwoba)}`}>
               {m.avg_xwoba.toFixed(3)}
             </td>
+            <td className="px-2 py-2 text-right font-mono">
+              {m.avg_hr_per_pa ? m.avg_hr_per_pa.toFixed(3) : 'N/A'}
+            </td>
             <td className="px-2 py-2 text-right">
               {m.avg_launch_angle.toFixed(1)}
             </td>
             <td className="px-2 py-2 text-right">
               {m.avg_barrels_per_pa.toFixed(3)}
             </td>
-            <td className={`px-2 py-2 text-right ${getHardHitColor(m.avg_hard_hit_pct)}`}>
-              {(m.avg_hard_hit_pct * 100).toFixed(1)}%
+            <td className={`px-2 py-2 text-right ${getHardHitColor(m.avg_hard_hit_pct || 0)}`}>
+              {m.avg_hard_hit_pct ? (m.avg_hard_hit_pct * 100).toFixed(1) : 'N/A'}%
             </td>
-            <td className={`px-2 py-2 text-right ${getKPercentColor(m.avg_k_percent)}`}>
-              {(m.avg_k_percent * 100).toFixed(1)}%
+            <td className={`px-2 py-2 text-right ${getKPercentColor(m.avg_k_percent || 0)}`}>
+              {m.avg_k_percent ? (m.avg_k_percent * 100).toFixed(1) : 'N/A'}%
             </td>
-            <td className={`px-2 py-2 text-right ${getBBPercentColor(m.avg_bb_percent)}`}>
-              {(m.avg_bb_percent * 100).toFixed(1)}%
+            <td className={`px-2 py-2 text-right ${getBBPercentColor(m.avg_bb_percent || 0)}`}>
+              {m.avg_bb_percent ? (m.avg_bb_percent * 100).toFixed(1) : 'N/A'}%
+            </td>
+            <td className={`px-2 py-2 text-right ${getWhiffPercentColor(m.avg_swing_miss_percent || 0)}`}>
+              {m.avg_swing_miss_percent ? (m.avg_swing_miss_percent * 100).toFixed(1) : 'N/A'}%
             </td>
             <td className="px-2 py-2 text-right">
-              {m.avg_exit_velocity.toFixed(1)}
+              {m.avg_exit_velocity ? m.avg_exit_velocity.toFixed(1) : 'N/A'}
             </td>
           </tr>
         ))}

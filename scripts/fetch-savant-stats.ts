@@ -1,9 +1,4 @@
 // scripts/fetch-savant-stats.ts
-
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
 /**
  * @file fetch-savant-stats.ts
  * @description Script to construct URLs and then download CSV files containing
@@ -17,6 +12,11 @@ import { fileURLToPath } from 'url';
  * This script will download CSV files containing Statcast data for specified seasons,
  * player types (batter/pitcher), and handedness matchups.
  */
+
+import fs from 'fs/promises';
+import path from 'path';
+
+import { fileURLToPath } from 'url';
 
 // --- Configuration Constants ---
 
