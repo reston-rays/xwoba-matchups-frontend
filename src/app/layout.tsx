@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,7 +30,23 @@ export default function RootLayout({
       >
         {/* Global Header */}
         <header className="p-4 border-b border-slate-700 bg-slate-800">
-          <h1 className="text-2xl font-bold text-slate-100">xwOBA Matchups</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-slate-100">xwOBA Matchups</h1>
+            <nav className="flex gap-4">
+              <Link 
+                href="/" 
+                className="px-3 py-1 text-slate-300 hover:text-slate-100 hover:bg-slate-700 rounded transition-colors"
+              >
+                Daily Matchups
+              </Link>
+              <Link 
+                href="/search" 
+                className="px-3 py-1 text-slate-300 hover:text-slate-100 hover:bg-slate-700 rounded transition-colors"
+              >
+                Player Search
+              </Link>
+            </nav>
+          </div>
         </header>
 
         {/* Main Content */}

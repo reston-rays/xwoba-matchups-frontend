@@ -115,6 +115,13 @@ export default function HomePage() {
         >
           &gt;
         </button>
+        <button
+          onClick={fetchGames}
+          disabled={loading}
+          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded transition-colors ml-2"
+        >
+          {loading ? 'Refreshing...' : 'Refresh Games'}
+        </button>
       </div>
 
       {/* Top Overall */}
