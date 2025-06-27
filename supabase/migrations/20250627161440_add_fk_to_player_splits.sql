@@ -1,0 +1,1 @@
+ALTER TABLE public.player_splits ADD CONSTRAINT fk_player_splits_player FOREIGN KEY (player_id) REFERENCES public.players(player_id);

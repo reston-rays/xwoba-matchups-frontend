@@ -8,9 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "backfill:splits": "tsx scripts/backfill-splits.ts",
-    "backfill:splits:test": "tsx scripts/backfill-splits.ts --test",
-    "gen:types": "supabase gen types typescript --project-id fkproqapfunjosherufo > src/types/database.types.ts"
+    "sync-types": "npx supabase gen types typescript --project-id fkproqapfunjosherufo > src/types/supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.5",
@@ -32,10 +30,11 @@
     "dotenv": "^16.5.0",
     "eslint": "^9.7.0",
     "eslint-config-next": "^15.3.3",
-    "supabase": "^2.23.4",
+    "supabase": "^2.26.9",
     "tailwindcss": "^4.1.8",
     "ts-node": "^10.9.2",
     "tsx": "^4.10.1",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "execa": "^9.3.0"
   }
 }

@@ -5,9 +5,18 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Papa from 'papaparse';
+import dotenv from 'dotenv';
 
 import { Database } from '../src/types/database.types';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 type PlayerSplit = Database['public']['Tables']['player_splits']['Row'];
+
+const SAVANT_CSV_INPUT_DIR = path.join(__dirname, 'savant_csv_output'); // Input directory for downloaded CSVs
+const WEIGHTED_STATS_CSV_FILENAME = 'weighted_player_stats.csv'; // Expected name of the weighted stats CSV
 
 /**
  * @file upload-savant-csvs-to-supabase.ts
@@ -21,12 +30,6 @@ type PlayerSplit = Database['public']['Tables']['player_splits']['Row'];
  *   Ensure .env file has SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
  *   tsx scripts/upload-savant-csvs-to-supabase.ts
  */
-
-// --- File Path Setup ---
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SAVANT_CSV_INPUT_DIR = path.join(__dirname, 'savant_csv_output'); // Input directory for downloaded CSVs
-const WEIGHTED_STATS_CSV_FILENAME = 'weighted_player_stats.csv'; // Expected name of the weighted stats CSV
 
 // --- Supabase Setup ---
 const SUPABASE_TABLE_NAME = 'player_splits'; // Target table in Supabase
@@ -175,7 +178,7 @@ async function processAndUploadSavantCsvs(): Promise<void> {
           avg_launch_angle: parseFloatAndRound(row.launch_angle, 2),       // DB field: avg_launch_angle, CSV: launch_angle
           hrs: parseIntOrNull(row.hrs),                                    // DB field: hrs, CSV: hrs
           swing_miss_percent: parseFloatAndRound(row.swing_miss_percent, 4, true), // CSV: swing_miss_percent, DB: numeric(5,4)
-          hyper_speed: parseFloatAndRound(row.hyper_speed, 1),                   // CSV: hyper_speed, DB: numeric(4,1)
+          hyper_speed: parseFloatOrNull(row.hyper_speed),                   // CSV: hyper_speed, DB: numeric(4,1)
 
           // Add missing properties for PlayerSplit
           k_percent: parseFloatAndRound(row.k_percent, 4, true), // CSV: k_percent (as percentage, e.g., "23.4")

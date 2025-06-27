@@ -7,7 +7,12 @@ type Team = Database['public']['Tables']['teams']['Row'];
 type Venue = Database['public']['Tables']['venues']['Row']; 
 
 import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // --- Configuration ---
 const SUPABASE_URL = process.env.SUPABASE_URL;

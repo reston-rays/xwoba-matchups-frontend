@@ -17,13 +17,14 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
-// --- Configuration Constants ---
+// --- File Path Setup ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const BASE_SAVANT_URL = 'https://baseballsavant.mlb.com/statcast_search/csv';
-
-// Define the seasons you want to generate URLs for
-const TARGET_SEASONS: number[] = [2022, 2023, 2024, 2025];
 
 // Define player types
 const PLAYER_TYPES: ('batter' | 'pitcher')[] = ['batter', 'pitcher'];
@@ -62,7 +63,7 @@ const COMMON_PARAMS: Record<string, string> = {
   hfOutfield: '', // Outfield Alignment (empty for all)
   hfInn: '', // Inning (empty for all)
   hfBBT: '', // Batted Ball Type (e.g., fly_ball, ground_ball) (empty for all)
-  hfFlag: 'is\\.\\.bunt\\.\\.not|', // Filter: Exclude bunts. Note: Backslashes are escaped for JS string.
+  hfFlag: 'is\\..bunt\\..not|', // Filter: Exclude bunts. Note: Backslashes are escaped for JS string.
   metric_1: '', // Secondary metric (empty)
   group_by: 'name', // Group results by player name
   min_pitches: '0', // Minimum pitches thrown (more relevant for pitchers if not grouping by PA)
@@ -92,24 +93,20 @@ const COMMON_PARAMS: Record<string, string> = {
   chk_stats_abs: 'on', // At Bats
   minors: 'false', // Exclude minor league games
 };
-
-// --- File Path Setup ---
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const SAVANT_CSV_OUTPUT_DIR = path.join(__dirname, 'savant_csv_output'); // Output directory for downloaded CSVs
 
 const DOWNLOAD_DELAY_MS = 15000; // 15 seconds delay between downloads
 
 // --- Function to Construct URLs and Download CSVs ---
 
-async function constructAndDownloadSavantCsvs(): Promise<void> {
+async function constructAndDownloadSavantCsvs(targetSeasons: number[]): Promise<void> {
   console.log('Constructing Baseball Savant Statcast URLs and downloading CSVs...\n');
   await fs.mkdir(SAVANT_CSV_OUTPUT_DIR, { recursive: true });
   console.log(`📂 CSVs will be saved to: ${SAVANT_CSV_OUTPUT_DIR}\n`);
 
   let firstDownload = true;
 
-  for (const season of TARGET_SEASONS) {
+  for (const season of targetSeasons) {
     for (const playerType of PLAYER_TYPES) {
       for (const opponentHand of HANDEDNESS_OPPONENT) {
 
@@ -169,8 +166,26 @@ async function constructAndDownloadSavantCsvs(): Promise<void> {
 // --- Main Execution ---
 
 async function main() {
+  const currentYear = new Date().getFullYear();
+  let targetSeasons: number[] = [currentYear]; // Default to current year
+
+  // Check for command-line arguments for specific seasons
+  const seasonArgIndex = process.argv.indexOf('--season');
+  if (seasonArgIndex > -1 && process.argv[seasonArgIndex + 1]) {
+    const seasonsInput = process.argv[seasonArgIndex + 1];
+    targetSeasons = seasonsInput.split(',').map(s => parseInt(s.trim(), 10)).filter(s => !isNaN(s));
+    if (targetSeasons.length === 0) {
+      console.warn('No valid seasons provided with --season flag. Defaulting to current year.');
+      targetSeasons = [currentYear];
+    }
+  } else if (process.argv.includes('--all-seasons')) {
+    // Example for fetching all historical seasons (adjust as needed)
+    targetSeasons = [2022, 2023, 2024, 2025]; // Or dynamically determine range
+    console.log('Fetching all historical seasons.');
+  }
+
   try {
-    await constructAndDownloadSavantCsvs();
+    await constructAndDownloadSavantCsvs(targetSeasons);
     console.log('\n🎉 Script finished.');
   } catch (error) {
     console.error('🔴 An unexpected error occurred during script execution:', error);
